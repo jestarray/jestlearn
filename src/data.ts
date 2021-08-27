@@ -4,9 +4,13 @@ let e_choice = new Problem(
   "select",
   "Which of the following statements are true about computers",
   [
-    { text: "computers use 0 and 1s", correct: true , explanation: ""},
-    { text: "computers were invented in the stone era", correct: false , explanation: ""},
-    { text: "computers use electricity", correct: true , explanation: ""},
+    { text: "computers use 0 and 1s", correct: true, explanation: "" },
+    {
+      text: "computers were invented in the stone era",
+      correct: false,
+      explanation: "",
+    },
+    { text: "computers use electricity", correct: true, explanation: "" },
   ],
   "hinty"
 );
@@ -15,21 +19,48 @@ let e_choice2 = new Problem(
   "select",
   "Which of the following statements are false about water?",
   [
-    { text: "water is abbreviated h2o in chemistry", correct: false , explanation: "<i>Yes but that is not what the question is asking</i>"},
-    { text: "water is not necssary for human survival", correct: true , explanation: ""},
-    { text: "most plants do not need water to survive", correct: true , explanation: ""},
+    {
+      text: "water is abbreviated h2o in chemistry",
+      correct: false,
+      explanation: "<i>Yes but that is not what the question is asking</i>",
+    },
+    {
+      text: "water is not necssary for human survival",
+      correct: true,
+      explanation: "",
+    },
+    {
+      text: "most plants do not need water to survive",
+      correct: true,
+      explanation: "",
+    },
   ],
   "hinty"
 );
 
-let e_choice_code = new Problem("select", `<pre class="line-numbers match-braces rainbow-braces"><code class="language-racket">
+let e_choice_code = new Problem(
+  "select",
+  `<pre class="line-numbers match-braces rainbow-braces"><code class="language-racket">
 ; What is the next stemp in the evaluation order?: 
 (+ 1 3 (* 50 3))
-</code></pre>`, [{text: `Ev <pre class="line-numbers match-braces rainbow-braces"><code class="language-racket">
-; Evaluate: 
+</code></pre>`,
+  [
+    {
+      text: `<pre class="line-numbers match-braces rainbow-braces"><code class="language-racket">
 (+ 1 3 (* 150))
-</code></pre>`, correct: true, explanation:""}, {text: "hii", correct:false, explanation: ""}]);
-
+</code></pre>`,
+      correct: true,
+      explanation: "Good job! We look to the most inward parens and evaluate that one first.",
+    },
+    {
+      text: `<pre class="line-numbers match-braces rainbow-braces"><code class="language-racket">
+(+ 4 (* 50 3))
+</code></pre>`,
+      correct: false,
+      explanation: "from left to right, find the most inward parens and evaluate it",
+    },
+  ]
+);
 
 let example_multi_choice = new ProblemSet(
   "Example Multi Choice",
@@ -37,7 +68,7 @@ let example_multi_choice = new ProblemSet(
   2,
   ["tag1", "tag2"],
   undefined,
-  [e_choice, e_choice2],
+  [e_choice, e_choice2, e_choice_code],
   [
     { kind: "📄 articles", url: "https://google.com" },
     { kind: "🎥 video", url: "https://youtube.com" },
@@ -100,11 +131,13 @@ export const TOC_original: ProblemSet[] = all.map((val) => Object.freeze(val));
 
 // we are mutating this
 //copy over the gen() functions that got removed because of stringify
-export let TOC: ProblemSet[] = JSON.parse(JSON.stringify(all)).map((val, index) => {
-  let m1 = Object.assign(val, TOC_original[index]);
-  //so we can run has_started() since it deleted the prototype link to the clas :/
-  m1.__proto__ = ProblemSet.prototype;
-  return m1;
-});
+export let TOC: ProblemSet[] = JSON.parse(JSON.stringify(all)).map(
+  (val, index) => {
+    let m1 = Object.assign(val, TOC_original[index]);
+    //so we can run has_started() since it deleted the prototype link to the clas :/
+    m1.__proto__ = ProblemSet.prototype;
+    return m1;
+  }
+);
 
 //window.toc = TOC;

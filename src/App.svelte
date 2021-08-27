@@ -114,7 +114,6 @@
       }
       //merge back the toc tags and stuff
       merged = diff_latest(merged, TOC_original);
-      console.log(merged, TOC_original, merged);
       localStorage.setItem("save", JSON.stringify(merged));
       //todo: diff with server copy and then upload to server
       //server should only store old finished attempts for analytics, e.g when the reset button is hit, so need to distuginish

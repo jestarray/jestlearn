@@ -52,10 +52,10 @@
   <div class="main-bar">
     <input type="text" placeholder="Search" bind:value={search_text} />
     {#if server_save_cache}
-      Logged in as: {server_save_cache.username}, Since: {new Date(
-        server_save_cache.date_created
-      ).toDateString()}
+      <i>Joined: {new Date(server_save_cache.date_created).toDateString()}</i>,
+      Logged in as: <b>{server_save_cache.username}</b>
       <button
+        class="logout-button"
         on:click={() => {
           localStorage.removeItem("save_server");
           localStorage.removeItem("save");
@@ -155,7 +155,7 @@
     {/each}
   </table>
   <b>{COURSE_NAME}</b> |
-  <a href="https://github.com/jestarray/jest_systems_web">Source Code</a>
+  <a href="https://github.com/jestarray/jest_learn">Source Code</a>
   |
   <a href="https://www.patreon.com/jestarray/">Support my work on Patreon!</a>
 </div>
@@ -194,6 +194,10 @@
     float: right;
     font-size: 28px;
     font-weight: bold;
+  }
+
+  .logout-button {
+    background-color: salmon;
   }
 
   .close:hover,

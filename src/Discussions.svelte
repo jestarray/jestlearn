@@ -4,11 +4,11 @@
 
 <title>{title}</title>
 <div class="utterances">
-  <h1>{title + ' Discussion'}</h1>
+  <h1>{title + " Discussion"}</h1>
   <p>Ask questions, suggest improvements, etc</p>
   <script
     src="https://utteranc.es/client.js"
-    repo="jestarray/jest_systems_web"
+    repo="jestarray/jestlearn"
     issue-term="title"
     theme="github-light"
     crossorigin="anonymous"

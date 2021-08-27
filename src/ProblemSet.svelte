@@ -1,6 +1,5 @@
 <script lang="ts">
   import InputProblem from "./InputProblem.svelte";
-  import ChoiceProblem from "./ChoiceProblem.svelte";
   import SelectProblem from "./SelectProblem.svelte";
   import { correct_answer_sound, wrong_answer_sound } from "./audio";
   import { createEventDispatcher } from "svelte";
@@ -10,52 +9,6 @@
   import { Sync } from "./utils";
 
   export let data: ProblemSet;
-  //let progress = data.progress;
-  /*   export let generate: null | Function; //function
-  export let progress: {
-    result: Result;
-    tries: number;
-    time: number;
-    hints: number;
-  }[];
-  export let problem_index; */
-
-  /* = [
-    {
-      type: "select",
-      question: "Which of the following statements are true about computers",
-      answer: [
-        { text: "computers use 0 and 1s", correct: true },
-        { text: "computers were invented in the stone era", correct: false },
-        { text: "computers use electricity", correct: true },
-      ],
-      hints: [], //list of strings? or a string templates
-    },
-    {
-      type: "input",
-      question: "<h1>What is 2 + 2?</h1>",
-      answer: 4,
-      input_answer_hint: "Answer e.g 2 or instrunctions to round to the nearest int etc"
-      hints: [], //list of strings? or a string templates
-    },
-
-    {
-      type: "choice",
-      question: "<h1>Who is the creator of linux?<h1>", //what if the question contains an image?
-      answer: [
-        { text: "bill gates", correct: false },
-        { text: "linus torvalds", correct: true },
-        { text: "john cena", correct: false },
-      ],
-      hints: [], //list of strings? or a string templates
-    },
-    {
-      type: "input",
-      question: "<h1>What is 2<sup>4</sup>?</h1>",
-      answer: 16,
-      hints: [], //list of strings? or a string templates
-    },
-  ]; */
   const dispatch = createEventDispatcher();
 
   let check_answer;
@@ -88,16 +41,6 @@
   {:else if current_problem.type === "input"}
     <InputProblem
       reset={reset_input_answer}
-      data={current_problem}
-      on:update-check={(event) => {
-        check_answer = event.detail;
-      }}
-      on:valid-input={(event) => {
-        is_valid = event.detail;
-      }}
-    />
-  {:else if current_problem.type === "choice"}
-    <ChoiceProblem
       data={current_problem}
       on:update-check={(event) => {
         check_answer = event.detail;
