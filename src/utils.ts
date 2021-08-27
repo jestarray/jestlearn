@@ -18,7 +18,7 @@ export function diff_latest(set_a, set_b) {
 			return index !== index2 && val1.id === val2.id
 		});
 		if(f.length > 0) {
-			return val1.last_updated >= f[0].last_updated;
+			return val1.last_updated > f[0].last_updated;
 		} else if(f.length === 0) {
 			//is unqiue so we keep it?
 			return true;
@@ -36,6 +36,7 @@ export function diff_latest(set_a, set_b) {
       }
     });
 }
+export const COURSE_NAME = "example course";
 
 //const website_sync_point = "https://jestlearn.com/sync"
 const website_sync_point = "http://localhost:3000/sync"
@@ -43,6 +44,7 @@ export async function send_sync(username, TOC, server_copy = [], code = 0) {
   let dlatest = diff_latest(TOC, server_copy);
   let send = {
     code: code,
+    course_name: COURSE_NAME,
     username: username,
     problem_sets: dlatest
       .filter((val, index) => {

@@ -4,7 +4,7 @@
   import { TOC } from "../data";
   import { createEventDispatcher } from "svelte";
   import { has_started } from "../ProblemSet";
-  import { Sync, send_sync } from "../utils";
+  import { Sync, send_sync, COURSE_NAME } from "../utils";
   const dispatch = createEventDispatcher();
   $: search_text = "";
   $: filtered =
@@ -84,6 +84,7 @@
               Sync.INITIAL
             ).then((x) => {
               x.code = Sync.INITIAL;
+              //console.log(x);
               dispatch("save", x);
               //force page refresh after save to update the homepage
               // but it will delte the username...
@@ -153,7 +154,9 @@
       </tr>
     {/each}
   </table>
-  <a href="https://github.com/jestarray/jest_systems_web">Source Code</a> |
+  <b>{COURSE_NAME}</b> |
+  <a href="https://github.com/jestarray/jest_systems_web">Source Code</a>
+  |
   <a href="https://www.patreon.com/jestarray/">Support my work on Patreon!</a>
 </div>
 

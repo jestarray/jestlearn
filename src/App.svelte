@@ -102,16 +102,19 @@
         if (server_data.code == Sync.ARCHIVE) {
           console.log("archiving");
         }
-        send_sync(
-          server_save_cache.username,
-          merged,
-          server_save_cache.problems,
-          server_data.code
-        ).then((rr) => {});
+        //not elseif!
+        if (server_data.code !== Sync.INITIAL) {
+          send_sync(
+            server_save_cache.username,
+            merged,
+            server_save_cache.problems,
+            server_data.code
+          ).then((rr) => {});
+        }
       }
-
       //merge back the toc tags and stuff
       merged = diff_latest(merged, TOC_original);
+      console.log(merged, TOC_original, merged);
       localStorage.setItem("save", JSON.stringify(merged));
       //todo: diff with server copy and then upload to server
       //server should only store old finished attempts for analytics, e.g when the reset button is hit, so need to distuginish
