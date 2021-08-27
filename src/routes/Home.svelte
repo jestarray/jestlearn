@@ -1,0 +1,202 @@
+<script lang="ts">
+  import ProblemSet from "../ProblemSet.svelte";
+  import { convert_to_hash } from "../utils";
+  import { TOC } from "../data";
+  import { createEventDispatcher } from "svelte";
+  import { has_started } from "../ProblemSet";
+  import { Sync, send_sync } from "../utils";
+  const dispatch = createEventDispatcher();
+  $: search_text = "";
+  $: filtered =
+    search_text.length > 0
+      ? TOC.filter((item) => {
+          let lowercase_search = search_text.toLowerCase();
+          function find_one(arr, search): boolean {
+            for (let item of arr) {
+              if (item.includes(search)) {
+                return true;
+              }
+            }
+            return false;
+          }
+          return (
+            item.title.toLowerCase().includes(lowercase_search) ||
+            find_one(item.tags, lowercase_search.trim())
+          );
+        })
+      : TOC;
+  function calculate_progress(progress) {
+    let solved = 0;
+    for (let item of progress) {
+      if (item.result === "+") {
+        solved++;
+      }
+    }
+    let res = `${solved}/${progress.length}`;
+    return res;
+  }
+  window.onclick = function (event) {
+    var modal = document.getElementById("resources-modal");
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
+  let server_save_cache = JSON.parse(localStorage.getItem("save_server"));
+  let username = "";
+  if (server_save_cache) {
+    username = server_save_cache.username;
+  }
+</script>
+
+<div>
+  <div class="main-bar">
+    <input type="text" placeholder="Search" bind:value={search_text} />
+    {#if server_save_cache}
+      Logged in as: {server_save_cache.username}, Since: {new Date(
+        server_save_cache.date_created
+      ).toDateString()}
+      <button
+        on:click={() => {
+          localStorage.removeItem("save_server");
+          localStorage.removeItem("save");
+          location.reload();
+        }}>Logout</button
+      >
+    {:else}
+      <input
+        name="username"
+        type="text"
+        placeholder="Username"
+        bind:value={username}
+      /><button
+        on:click={function login() {
+          if (username.length > 0) {
+            let server_save_cache =
+              JSON.parse(localStorage.getItem("save_server")) || [];
+            if (server_save_cache.username !== username) {
+              //logging in with a different user
+              server_save_cache = [];
+            }
+            send_sync(
+              username,
+              TOC,
+              server_save_cache.problems,
+              Sync.INITIAL
+            ).then((x) => {
+              x.code = Sync.INITIAL;
+              dispatch("save", x);
+              //force page refresh after save to update the homepage
+              // but it will delte the username...
+              location.reload();
+            });
+          }
+        }}>Enter</button
+      >
+    {/if}
+  </div>
+  <table>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Title</th>
+      <th scope="col">Progress</th>
+      <th scope="col">Resources</th>
+      <th scope="col">Discuss</th>
+      <th scope="col">Mark</th>
+    </tr>
+
+    {#each filtered as item}
+      <tr>
+        <td>{item.id}</td>
+        <td><a href={"#" + convert_to_hash(item.title)}>{item.title}</a></td>
+        <td>{calculate_progress(item.problems)} </td>
+        <td>
+          <div id="resources-modal" class="modal">
+            <div class="modal-content">
+              <span
+                class="close"
+                on:click={() => {
+                  var modal = document.getElementById("resources-modal");
+                  modal.style.display = "none";
+                }}>&times;</span
+              >
+
+              {#each item.resources as res}
+                <p>
+                  <a href={res.url} title={res.url} target="_blank"
+                    >{res.kind}
+                  </a>
+                </p>{/each}
+            </div>
+          </div>
+          <button
+            on:click={() => {
+              var modal = document.getElementById("resources-modal");
+              modal.style.display = "block";
+            }}>View</button
+          >
+        </td>
+        <td><a href={"/#discuss/" + convert_to_hash(item.title)}>Github</a></td>
+        <td
+          ><select
+            bind:value={item.emoji_mark}
+            on:change={() => {
+              item.last_updated = Date.now();
+              dispatch("save", { code: Sync.UPDATE });
+            }}
+          >
+            <option value="❓">❓</option>
+            <option value="⚠️">⚠️</option>
+            <option value="✅">✅</option>
+            <option value="❌">❌</option>
+          </select></td
+        >
+      </tr>
+    {/each}
+  </table>
+  <a href="https://github.com/jestarray/jest_systems_web">Source Code</a> |
+  <a href="https://www.patreon.com/jestarray/">Support my work on Patreon!</a>
+</div>
+
+<style>
+  /* The Modal (background) */
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  }
+  .main-bar {
+    display: inline;
+  }
+
+  /* Modal Content */
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+
+  /* The Close Button */
+  .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+</style>
