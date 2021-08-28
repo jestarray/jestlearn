@@ -66,11 +66,11 @@ export async function send_sync(username, TOC, server_copy = [], code = 0) {
         delete clone.resources;
         delete clone.tags;
         clone.problems = clone.problems.map((problem) => {
-          //TODO: DELETE INPUT ANSWER HINTS AND EXPLANATIONS? NO NEED TO STORE THEM?
-          delete problem.input_answer_hint;
+          // keep input_answer_hints and explanations because they might be procedurally generated explanations
+          //delete problem.input_answer_hint;
           if (Array.isArray(problem.answer)) {
             problem.answer = problem.answer.map((answ) => {
-              delete answ.explanation;
+              //delete answ.explanation;
               return answ;
             });
           }
