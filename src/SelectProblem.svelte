@@ -64,6 +64,7 @@
         bind:group={selected}
         value={index}
         on:click={function () {}}
+        disabled={enable_next_button}
       />
       {@html option.text}
       {#if enable_next_button}

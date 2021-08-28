@@ -79,7 +79,7 @@ export async function send_sync(username, TOC, server_copy = [], code = 0) {
         return clone;
       }),
   };
-  console.log(send);
+  ///console.log(send);
   let response = await fetch(website_sync_point, {
     method: "POST",
     headers: {
