@@ -40,7 +40,7 @@ export class ProblemSet {
   //if you aren't generating problems, stick it in the data field
   problems: Problem[];
   gen: Function | undefined;
-  resources: { kind: string; url: string }[]; //ray of links to theoretical content
+  resources: { url_title: string; url: string, additional: string}[]; //ray of links to theoretical content, additional can be some html though its not recommended because its better to have things open in a new tab rather than needing to keep popping the modal on and off
   emoji_mark: string;
   last_updated: number;
   constructor(
@@ -49,8 +49,8 @@ export class ProblemSet {
     num_of_problems: number = 1,
     tags: string[],
     gen: Function | undefined,
-    problems: Problem[],
-    resources: { kind: string; url: string }[] = [],
+    problems: Problem[] = [],
+    resources: { url_title: string; url: string, additional: string}[] = [],
     emoji_mark: string = "❓"
   ) {
     this.title = title;

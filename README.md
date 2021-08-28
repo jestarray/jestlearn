@@ -4,6 +4,7 @@
 Make multichoice/input problems with ease!
 
 ## How to use:
+`data.ts` is the active file read by the rest of the program, so just copy and paste your course data into it and generate the `public` folder and distribute that! (note: typescript/something will try to auto-fix imports! make sure every component is only reading `./data` and not `./data_computer_systems`, etc)
 Edit `course_name` in `data.ts`, should be unique
 Edit `data.ts` with problem sets and such and that's mostly it
 If you want cloud syncing change the `website_sync_point` and self host the server. For now it's pointed at my server

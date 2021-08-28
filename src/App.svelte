@@ -5,8 +5,9 @@
   import { Sync } from "./utils";
   import router from "page";
   import { convert_to_hash, diff_latest, send_sync } from "./utils";
-  import { TOC, TOC_original } from "./data";
+  import { TOC, TOC_original, COURSE_NAME } from "./data";
   import Discussions from "./Discussions.svelte";
+  import { claim_text } from "svelte/internal";
 
   // converts hash url to title, e.g binary_to_decimal -> Binary To Decimal
   export function convert_to_title(st: string): string {
@@ -23,14 +24,14 @@
   let params;
   let section: ProblemSetData | undefined;
   let merged = TOC;
+  let course_home_hash = convert_to_hash(COURSE_NAME);
 
-  router("/", (ctx, next) => {
+  const route_pages = (ctx, next) => {
     let hash: string = ctx.hash;
     if (hash.includes("discuss")) {
       page = Discussions;
       let slash_index = hash.indexOf("/") + 1;
       let path = hash.slice(slash_index, hash.length);
-      console.log(path);
       let title = convert_to_title(path);
       params = { title: title };
     } else {
@@ -49,7 +50,6 @@
           return res;
         });
       }
-
       section = merged.find((item) => {
         return convert_to_hash(item.title) === hash;
       });
@@ -67,10 +67,23 @@
         } else {
           params.problems = params.problems;
         }
+      } else if (course_home_hash) {
+        page = Home;
       } else {
         page = Home;
       }
     }
+  };
+  let root = "";
+  //for when you have a single domain but multiple courses on that domain/server where the vps distributes all the course static files(see server.js), e.g jestlearn.com/computers404 , jestlearn.com/how_to_code
+  router(`/${course_home_hash}`, (ctx, next) => {
+    route_pages(ctx, next);
+    root = `/${course_home_hash}`;
+  });
+  //for when the initial static file get req is just the root domain, e.g when hosting on github pages or netlify, learnhowtocode.com/
+  router(`/`, (ctx, next) => {
+    route_pages(ctx, next);
+    root = ``;
   });
   router("/discuss", () => {
     page = Discussions;
@@ -81,13 +94,14 @@
 
 {#if page !== Home}
   <nav class="home-alignment">
-    <a href="/">🏠Home</a>
+    <a href={`/${course_home_hash}`}>🏠Home</a>
   </nav>
 {/if}
 
 <main class="flex-placement">
   <svelte:component
     this={page}
+    base_path={root}
     {params}
     title={params ? params.title : ""}
     data={params}

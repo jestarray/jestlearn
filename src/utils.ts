@@ -1,3 +1,6 @@
+import { COURSE_NAME } from "./data";
+
+///replace spaces with underscores and lower cases the name
 export function convert_to_hash(st: string): string {
   let regex = / /gi;
   let replace_spaces = st.replace(regex, "_");
@@ -36,7 +39,6 @@ export function diff_latest(set_a, set_b) {
       }
     });
 }
-export const COURSE_NAME = "example course";
 
 const website_sync_point = "https://jestlearn.com/sync"
 //const website_sync_point = "http://localhost:3000/sync"

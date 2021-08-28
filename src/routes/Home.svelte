@@ -1,10 +1,11 @@
 <script lang="ts">
   import ProblemSet from "../ProblemSet.svelte";
   import { convert_to_hash } from "../utils";
-  import { TOC } from "../data";
+  import { TOC, COURSE_NAME } from "../data";
   import { createEventDispatcher } from "svelte";
   import { has_started } from "../ProblemSet";
-  import { Sync, send_sync, COURSE_NAME } from "../utils";
+  import { Sync, send_sync } from "../utils";
+  export let base_path;
   const dispatch = createEventDispatcher();
   $: search_text = "";
   $: filtered =
@@ -49,6 +50,7 @@
 </script>
 
 <div>
+  <h1>{COURSE_NAME}</h1>
   <div class="main-bar">
     <input type="text" placeholder="Search" bind:value={search_text} />
     {#if server_save_cache}
@@ -78,7 +80,7 @@
               server_save_cache = [];
             }
             send_sync(
-              username,
+              username.toLowerCase().trim(),
               TOC,
               server_save_cache.problems,
               Sync.INITIAL
@@ -94,6 +96,18 @@
         }}>Enter</button
       >
     {/if}
+  </div>
+
+  <div id="resources-modal" class="modal">
+    <div class="modal-content" id="m-content">
+      <span
+        class="close"
+        on:click={() => {
+          var modal = document.getElementById("resources-modal");
+          modal.style.display = "none";
+        }}>&times;</span
+      >
+    </div>
   </div>
   <table>
     <tr>
@@ -111,32 +125,35 @@
         <td><a href={"#" + convert_to_hash(item.title)}>{item.title}</a></td>
         <td>{calculate_progress(item.problems)} </td>
         <td>
-          <div id="resources-modal" class="modal">
-            <div class="modal-content">
-              <span
-                class="close"
-                on:click={() => {
-                  var modal = document.getElementById("resources-modal");
-                  modal.style.display = "none";
-                }}>&times;</span
-              >
-
-              {#each item.resources as res}
-                <p>
-                  <a href={res.url} title={res.url} target="_blank"
-                    >{res.kind}
-                  </a>
-                </p>{/each}
-            </div>
-          </div>
           <button
+            disabled={item.resources.length <= 0}
             on:click={() => {
               var modal = document.getElementById("resources-modal");
               modal.style.display = "block";
+              var modal_content = document.getElementById("m-content");
+              if (item.resources.length > 0) {
+                console.log(item.resources);
+                modal_content.innerHTML = item.resources
+                  .map((res) => {
+                    return `<p>
+                  <a href=${res.url} title=${res.url} target="_blank"
+                    >${res.url}
+                  </a>
+                  ${res.additional}
+                </p>`;
+                  })
+                  .reduce((prev, curr) => prev + curr);
+              } else {
+                modal_content.innerHTML = "";
+              }
             }}>View</button
           >
         </td>
-        <td><a href={"/#discuss/" + convert_to_hash(item.title)}>Github</a></td>
+        <td
+          ><a href={`${base_path}/#discuss/${convert_to_hash(item.title)}`}
+            >Github</a
+          ></td
+        >
         <td
           ><select
             bind:value={item.emoji_mark}
@@ -154,10 +171,10 @@
       </tr>
     {/each}
   </table>
-  <b>{COURSE_NAME}</b> |
-  <a href="https://github.com/jestarray/jest_learn">Source Code</a>
+  <a href="https://github.com/jestarray/jestlearn">Source Code v0.0.2</a>
   |
   <a href="https://www.patreon.com/jestarray/">Support my work on Patreon!</a>
+  | <a href="https://www.jestlearn.com/">Other courses</a>
 </div>
 
 <style>
