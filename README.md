@@ -7,6 +7,13 @@ Make multichoice/input problems with ease!
 Edit `course_name` in `data.ts`, should be unique
 Edit `data.ts` with problem sets and such and that's mostly it
 If you want cloud syncing change the `website_sync_point` and self host the server. For now it's pointed at my server
+If you want to support more languages, just replace prism.js and prism.css
+
+## Legend:
+✅ - for correct answer
+❌ - for incorrect answer
+⚠️ - for corrected incorrect answer
+❓ - for unanswered
 
 ## Todo:
 * Anki spaced alg.
@@ -22,5 +29,8 @@ If you want cloud syncing change the `website_sync_point` and self host the serv
 < 1000 lines of code
 I just want something super simple, fast, flexible(open source), and offline to make small educational exercise content. Google classroom and everything else is too bloat, not to mention I don't really care about grades. Instead of focusing on grades, focus on constant repitition, ergo Anki, because memory is fragile.
 
+Mistranslated quote but emphasis on doing always rather than listening/watching
+> What I hear, I forget; What I see, I remember; What I do, I understand. —Confucius, 551–479 BC
+> What I cannot create I do not understand - Feynman
 ## Credits:
 * Favicon provided by https://twemoji.twitter.com/
