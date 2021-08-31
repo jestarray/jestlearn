@@ -123,7 +123,11 @@
             merged,
             server_save_cache.problems,
             server_data.code
-          ).then((rr) => {});
+          )
+            .then((rr) => {})
+            .catch((err) => {
+              console.warn(err);
+            });
         }
       }
       //merge back the toc tags and stuff

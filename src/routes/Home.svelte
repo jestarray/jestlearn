@@ -84,14 +84,18 @@
               TOC,
               server_save_cache.problems,
               Sync.INITIAL
-            ).then((x) => {
-              x.code = Sync.INITIAL;
-              //console.log(x);
-              dispatch("save", x);
-              //force page refresh after save to update the homepage
-              // but it will delte the username...
-              location.reload();
-            });
+            )
+              .then((x) => {
+                x.code = Sync.INITIAL;
+                //console.log(x);
+                dispatch("save", x);
+                //force page refresh after save to update the homepage
+                // but it will delte the username...
+                location.reload();
+              })
+              .catch((err) => {
+                console.warn(err);
+              });
           }
         }}>Enter</button
       >

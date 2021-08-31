@@ -22,6 +22,7 @@
   $: current_problem = data.problems[data.problem_index];
   $: reset_input_answer = false;
   let reset_problems = false;
+  let show_answer_option = false;
 </script>
 
 <title>{data.title}</title>
@@ -42,6 +43,7 @@
     <InputProblem
       reset={reset_input_answer}
       data={current_problem}
+      {show_answer_option}
       on:update-check={(event) => {
         check_answer = event.detail;
       }}
@@ -132,6 +134,7 @@
             correct_answer_sound.currentTime = 0;
             correct_answer_sound.play();
           } else {
+            show_answer_option = true;
             wrong_answer_sound.play();
             data.problems[data.problem_index].result = "-";
           }

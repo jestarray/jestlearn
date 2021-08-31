@@ -4,6 +4,7 @@
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
   export let input_answer = "";
+  export let show_answer_option;
   $: if (reset) {
     input_answer = "";
   }
@@ -25,4 +26,10 @@
   </div>
   <p>{data.input_answer_hint}</p>
   <input type="text" bind:value={input_answer} />
+  {#if show_answer_option}
+    <details>
+      <summary>show answer</summary>
+      {data.answer}
+    </details>
+  {/if}
 </div>
