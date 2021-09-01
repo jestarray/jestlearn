@@ -131,6 +131,7 @@
             //the date timestamp for when they got it correct
             data.problems[data.problem_index].time = Date.now();
             enable_next_button = true;
+            show_answer_option = false;
             correct_answer_sound.currentTime = 0;
             correct_answer_sound.play();
           } else {
