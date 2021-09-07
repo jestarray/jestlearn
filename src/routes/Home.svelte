@@ -1,16 +1,18 @@
 <script lang="ts">
-  import ProblemSet from "../ProblemSet.svelte";
+  import type { ProblemSet as ProblemSetData } from "../ProblemSet";
   import { convert_to_hash } from "../utils";
   import { TOC, COURSE_NAME } from "../data";
   import { createEventDispatcher } from "svelte";
   import { has_started } from "../ProblemSet";
   import { Sync, send_sync } from "../utils";
   export let base_path;
+  export let merged: ProblemSetData[];
+  export let server_save_cache;
   const dispatch = createEventDispatcher();
   $: search_text = "";
   $: filtered =
     search_text.length > 0
-      ? TOC.filter((item) => {
+      ? merged.filter((item) => {
           let lowercase_search = search_text.toLowerCase();
           function find_one(arr, search): boolean {
             for (let item of arr) {
@@ -25,11 +27,11 @@
             find_one(item.tags, lowercase_search.trim())
           );
         })
-      : TOC;
+      : merged;
   function calculate_progress(progress) {
     let solved = 0;
     for (let item of progress) {
-      if (item.result === "+") {
+      if (item.result === "✅") {
         solved++;
       }
     }
@@ -42,7 +44,6 @@
       modal.style.display = "none";
     }
   };
-  let server_save_cache = JSON.parse(localStorage.getItem("save_server"));
   let username = "";
   if (server_save_cache) {
     username = server_save_cache.username;
@@ -74,24 +75,13 @@
         on:click={function login() {
           //validate username form
           if (username.length > 0) {
-            let server_save_cache =
-              JSON.parse(localStorage.getItem("save_server")) || [];
-            if (server_save_cache.username !== username) {
-              //logging in with a different user
-              server_save_cache = [];
-            }
             //send the problems worked on to the server
-            send_sync(
-              username.toLowerCase().trim(),
-              TOC,
-              server_save_cache.problems,
-              Sync.INITIAL
-            )
-              .then((x) => {
-                x.code = Sync.INITIAL;
-                dispatch("save", x);
+            send_sync(username.toLowerCase().trim(), TOC, [], Sync.INITIAL)
+              .then((data_from_server) => {
+                data_from_server.code = Sync.INITIAL;
+                dispatch("save", data_from_server);
                 //force page refresh after save to update the homepage
-                location.reload();
+                //location.reload();
               })
               .catch((err) => {
                 console.warn(err);
@@ -129,29 +119,30 @@
         <td><a href={"#" + convert_to_hash(item.title)}>{item.title}</a></td>
         <td>{calculate_progress(item.problems)} </td>
         <td>
-          <button
-            disabled={item.resources.length <= 0}
-            on:click={() => {
-              var modal = document.getElementById("resources-modal");
-              modal.style.display = "block";
-              var modal_content = document.getElementById("m-content");
-              if (item.resources.length > 0) {
-                console.log(item.resources);
-                modal_content.innerHTML = item.resources
-                  .map((res) => {
-                    return `<p>
+          {#if item.resources}
+            <button
+              disabled={item.resources.length <= 0}
+              on:click={() => {
+                var modal = document.getElementById("resources-modal");
+                modal.style.display = "block";
+                var modal_content = document.getElementById("m-content");
+                if (item.resources.length > 0) {
+                  modal_content.innerHTML = item.resources
+                    .map((res) => {
+                      return `<p>
                   <a href=${res.url} title=${res.url} target="_blank"
                     >${res.url}
                   </a>
                   ${res.additional}
                 </p>`;
-                  })
-                  .reduce((prev, curr) => prev + curr);
-              } else {
-                modal_content.innerHTML = "";
-              }
-            }}>View</button
-          >
+                    })
+                    .reduce((prev, curr) => prev + curr);
+                } else {
+                  modal_content.innerHTML = "";
+                }
+              }}>View</button
+            >
+          {/if}
         </td>
         <td
           ><a href={`${base_path}#discuss/${convert_to_hash(item.title)}`}
@@ -175,7 +166,7 @@
       </tr>
     {/each}
   </table>
-  <a href="https://github.com/jestarray/jestlearn">Source Code v0.0.3</a>
+  <a href="https://github.com/jestarray/jestlearn">Source Code v0.0.4</a>
   |
   <a href="https://www.patreon.com/jestarray/">Support my work on Patreon!</a>
   | <a href="https://www.jestlearn.com/">Other courses</a>

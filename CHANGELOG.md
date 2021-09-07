@@ -1,3 +1,9 @@
+# 0.0.4
+- Fixed TOC not updating
+- Merged back other deleted props rather than just .gen()
+- Page no longer refreshes after logging in
+- Added support for hitting enter key to proceed for InputProblems
+- No longer using + - ! ? , all emoji now
 # 0.0.3
 - No longer saving problems that have not been worked on in localstorage
 - Fixed diffing algorithim to merge ones that dont exist along with getting rid of duplicates

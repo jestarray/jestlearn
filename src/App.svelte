@@ -1,6 +1,9 @@
 <script lang="ts">
   import ProblemSet from "./ProblemSet.svelte";
-  import { merge_gen_funcs, ProblemSet as ProblemSetData } from "./ProblemSet";
+  import {
+    merge_back_deleted_props,
+    ProblemSet as ProblemSetData,
+  } from "./ProblemSet";
   import Home from "./routes/Home.svelte";
   import { Sync } from "./utils";
   import router from "page";
@@ -22,8 +25,7 @@
   let page;
   let discussion_title = "";
   let section: ProblemSetData | undefined;
-  let merged = TOC;
-
+  let merged: ProblemSetData[] = TOC;
   async function route_pages(ctx, next) {
     let hash: string = ctx.hash;
     if (hash.includes("discuss")) {
@@ -39,7 +41,8 @@
         localStorage.getItem("save")
       );
       if (saved) {
-        merged = merge_gen_funcs(diff_latest(TOC, saved), TOC);
+        merged = merge_back_deleted_props(diff_latest(TOC, saved), TOC);
+        merged = merged;
       }
       section = merged.find((item) => {
         return convert_to_hash(item.title) === hash;
@@ -81,10 +84,10 @@
   });
 
   router.start();
-
   function filter_non_worked_on(arr: ProblemSetData[]) {
     return arr.filter((val) => val.last_updated > 0);
   }
+  let server_save_cache = JSON.parse(localStorage.getItem("save_server"));
 </script>
 
 {#if page !== Home}
@@ -99,12 +102,14 @@
     base_path={course_base_path}
     title={discussion_title}
     data={section}
+    {merged}
+    {server_save_cache}
     on:save={(diff_with) => {
       let server_data = diff_with.detail;
       if (server_data !== null && server_data.problems !== undefined) {
         localStorage.setItem("save_server", JSON.stringify(server_data));
       }
-      let server_save_cache = JSON.parse(localStorage.getItem("save_server"));
+      server_save_cache = JSON.parse(localStorage.getItem("save_server"));
       if (server_save_cache !== null) {
         merged = diff_latest(merged, server_save_cache.problems);
         if (server_data.code == Sync.ARCHIVE) {
@@ -125,8 +130,12 @@
         }
       }
       //merge back the toc tags and stuff
-      merged = diff_latest(merged, TOC_original);
-      //todo: dont save the ones that are last_upadted 0?
+      merged = merge_back_deleted_props(
+        diff_latest(merged, TOC_original),
+        TOC_original
+      );
+      merged = merged;
+      //todo: dont save the ones that are last_updated 0?
       localStorage.setItem(
         "save",
         JSON.stringify(filter_non_worked_on(merged))

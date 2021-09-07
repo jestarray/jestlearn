@@ -20,14 +20,10 @@ export class Problem {
     this.question = question;
     this.answer = answer;
     this.input_answer_hint = input_answer_hint;
-    this.result = "?";
+    this.result = "❓";
     this.tries = 0;
     this.time = 0;
     this.hints = 0;
-    /* type: "input",
-        question: `<h2>Convert ${subscript(binary, 2)} to hex?</h2>`,
-        answer: "0x" + hex,
-        input_answer_hint: "prefix with '0x', example: 0xbfa11", */
   }
 }
 
@@ -74,11 +70,13 @@ export function has_started(problems: Problem[]): boolean {
 }
 
 //adds back the gen() functions that were not seralized
-export function merge_gen_funcs(without: ProblemSet[], original: ProblemSet[]): ProblemSet[] {
+export function merge_back_deleted_props(without: ProblemSet[], original: ProblemSet[]): ProblemSet[] {
   return without.map((val) => {
     let found = original.find((hay) => val.id === hay.id);
     if(found) {
       val.gen = found.gen;
+      val.resources = found.resources;
+      val.tags = found.tags;
       return val;
     } else {
       return val;

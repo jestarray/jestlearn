@@ -23,18 +23,84 @@
   $: reset_input_answer = false;
   let reset_problems = false;
   let show_answer_option = false;
+
+  function check() {
+    reset_input_answer = false;
+    data.problems[data.problem_index].tries += 1;
+    if (check_answer && check_answer()) {
+      if (data.problems[data.problem_index].tries == 1) {
+        //got it right on the first try
+        data.problems[data.problem_index].result = "✅";
+      } else {
+        //got it wrong once but corrected
+        data.problems[data.problem_index].result = "⚠️";
+      }
+      //the date timestamp for when they got it correct
+      data.problems[data.problem_index].time = Date.now();
+      enable_next_button = true;
+      show_answer_option = false;
+      correct_answer_sound.currentTime = 0;
+      correct_answer_sound.play();
+    } else {
+      show_answer_option = true;
+      wrong_answer_sound.play();
+      data.problems[data.problem_index].result = "❌";
+    }
+    data.last_updated = Date.now();
+    dispatch("save", { code: Sync.UPDATE });
+  }
+  async function reset() {
+    if (data.problem_index < data.problems.length - 1) {
+      data.problem_index += 1;
+      enable_next_button = false;
+      check_answer = null;
+      is_valid = false;
+    } else {
+      finished_all_problems = true;
+      if (finished_all_problems) {
+        if (reset_problems) {
+          reset_problems = false;
+          data.problem_index = 0;
+          enable_next_button = false;
+          check_answer = null;
+          is_valid = false;
+          finished_all_problems = false;
+          if (data.gen) {
+            let generated = await data.gen();
+            data.problems = generated;
+            data.problems = data.problems;
+          } else {
+            //if the TOC data updates and the user resets the problem, they will get the latest TOC version rather than having an old version of a non-updated TOC
+            let cloned = JSON.parse(JSON.stringify(TOC_original)).find(
+              (val) => {
+                return val.title === data.title;
+              }
+            ).problems;
+            //do not change data.problems = , assignment because it wont work if you do data.problems = .
+            //https://svelte.dev/tutorial/updating-arrays-and-objects
+            data.problems = cloned;
+            data.problems = data.problems;
+          }
+        } else {
+          reset_problems = true;
+        }
+      }
+    }
+    data.last_updated = Date.now();
+    let code = Sync.UPDATE;
+    if (finished_all_problems) {
+      code = Sync.ARCHIVE;
+    }
+    dispatch("save", { code: code });
+    reset_input_answer = true;
+  }
 </script>
 
 <title>{data.title}</title>
 <div>
   {#each data.problems as item, index}
     <span style="margin: 0.5rem;">
-      {#if item.result === "+"}
-        ✅
-      {:else if item.result === "-"}❌
-      {:else if item.result === "!"}
-        ⚠️
-      {:else}❓{/if}
+      {item.result}
     </span>
   {/each}
   {#if data.problems.length <= 0}
@@ -50,6 +116,7 @@
       on:valid-input={(event) => {
         is_valid = event.detail;
       }}
+      on:check-answer={enable_next_button ? reset : check}
     />
   {:else if current_problem.type === "select"}
     <SelectProblem
@@ -65,81 +132,13 @@
   {/if}
   <div class="text-align-center">
     {#if enable_next_button}
-      <button
-        class="button"
-        on:click={async function reset() {
-          if (data.problem_index < data.problems.length - 1) {
-            data.problem_index += 1;
-            enable_next_button = false;
-            check_answer = null;
-            is_valid = false;
-          } else {
-            finished_all_problems = true;
-            if (finished_all_problems) {
-              if (reset_problems) {
-                reset_problems = false;
-                data.problem_index = 0;
-                enable_next_button = false;
-                check_answer = null;
-                is_valid = false;
-                finished_all_problems = false;
-                if (data.gen) {
-                  let generated = await data.gen();
-                  data.problems = generated;
-                  data.problems = data.problems;
-                } else {
-                  //if the TOC data updates and the user resets the problem, they will get the latest TOC version rather than having an old version of a non-updated TOC
-                  let cloned = JSON.parse(JSON.stringify(TOC_original)).find(
-                    (val) => {
-                      return val.title === data.title;
-                    }
-                  ).problems;
-                  //do not change data.problems = , assignment because it wont work if you do data.problems = .
-                  //https://svelte.dev/tutorial/updating-arrays-and-objects
-                  data.problems = cloned;
-                }
-              } else {
-                reset_problems = true;
-              }
-            }
-          }
-          data.last_updated = Date.now();
-          let code = Sync.UPDATE;
-          if (finished_all_problems) {
-            code = Sync.ARCHIVE;
-          }
-          dispatch("save", { code: code });
-          reset_input_answer = true;
-        }}>{finished_all_problems ? "Reset" : "Next"}</button
+      <button class="button" on:click={reset}
+        >{finished_all_problems ? "Reset" : "Next"}</button
       >
     {:else}
       <button
         class={is_valid ? "button" : "button disabled"}
-        on:click={() => {
-          reset_input_answer = false;
-          data.problems[data.problem_index].tries += 1;
-          if (check_answer()) {
-            if (data.problems[data.problem_index].tries == 1) {
-              //got it right on the first try
-              data.problems[data.problem_index].result = "+";
-            } else {
-              //got it wrong once but corrected
-              data.problems[data.problem_index].result = "!";
-            }
-            //the date timestamp for when they got it correct
-            data.problems[data.problem_index].time = Date.now();
-            enable_next_button = true;
-            show_answer_option = false;
-            correct_answer_sound.currentTime = 0;
-            correct_answer_sound.play();
-          } else {
-            show_answer_option = true;
-            wrong_answer_sound.play();
-            data.problems[data.problem_index].result = "-";
-          }
-          data.last_updated = Date.now();
-          dispatch("save", { code: Sync.UPDATE });
-        }}
+        on:click={check}
         disabled={!is_valid}>Check</button
       >
     {/if}

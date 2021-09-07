@@ -21,6 +21,7 @@
   afterUpdate(() => {
     Prism.highlightAll();
   });
+  //todo: hotkey enter to submit the answer
 </script>
 
 <div>
@@ -28,7 +29,15 @@
     {@html data.question}
   </div>
   <p>{data.input_answer_hint}</p>
-  <input type="text" bind:value={input_answer} />
+  <input
+    type="text"
+    bind:value={input_answer}
+    on:keypress={(e) => {
+      if (input_answer.length > 0 && e.key === "Enter") {
+        dispatch("check-answer");
+      }
+    }}
+  />
   {#if show_answer_option}
     <details>
       <summary>show answer</summary>

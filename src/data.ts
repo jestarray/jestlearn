@@ -1,3 +1,4 @@
+import { object_without_properties } from "svelte/internal";
 import { ProblemSet, Problem, gen_amount } from "./ProblemSet";
 /// min and max are inclusive
 function ran_int(min = 0, max = 1) {
@@ -31,7 +32,7 @@ let racket_math_expressions = new ProblemSet(
   [
     {
       url_title: "article",
-      url: "https://computers404.netlify.app/06-binarynumbers",
+      url: "https://jesthowtocode.netlify.app/expressions.html",
       additional: "",
     },
     { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
@@ -97,7 +98,7 @@ let racket_string_practice = new ProblemSet(
   [
     {
       url_title: "article",
-      url: "https://computers404.netlify.app/06-binarynumbers",
+      url: "https://jesthowtocode.netlify.app/strings.html",
       additional: "",
     },
     { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
@@ -124,4 +125,4 @@ export let TOC: ProblemSet[] = JSON.parse(JSON.stringify(all)).map(
 );
 //window.toc = TOC;
 //the home page of your course will be at https://yourdomain.com/example_course , where example_course is the name of the course(all spaces are replaced by underscores)
-export const COURSE_NAME = "how to code";
+export const COURSE_NAME = "how to code"
