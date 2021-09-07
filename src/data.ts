@@ -17,7 +17,7 @@ let racket_math_expressions = new ProblemSet(
   async function get_it() {
     let id = 0;
     let amount = 5;
-    let response = await fetch("http://jestlearn.com/exercise", {
+    let response = await fetch("https://jestlearn.com/exercise", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
