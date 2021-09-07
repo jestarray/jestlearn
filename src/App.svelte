@@ -1,13 +1,12 @@
 <script lang="ts">
   import ProblemSet from "./ProblemSet.svelte";
-  import type { ProblemSet as ProblemSetData } from "./ProblemSet";
+  import { merge_gen_funcs, ProblemSet as ProblemSetData } from "./ProblemSet";
   import Home from "./routes/Home.svelte";
   import { Sync } from "./utils";
   import router from "page";
   import { convert_to_hash, diff_latest, send_sync } from "./utils";
   import { TOC, TOC_original, COURSE_NAME } from "./data";
   import Discussions from "./Discussions.svelte";
-  import { claim_text } from "svelte/internal";
 
   // converts hash url to title, e.g binary_to_decimal -> Binary To Decimal
   export function convert_to_title(st: string): string {
@@ -21,90 +20,85 @@
     return result;
   }
   let page;
-  let params;
+  let discussion_title = "";
   let section: ProblemSetData | undefined;
   let merged = TOC;
-  let course_home_hash = convert_to_hash(COURSE_NAME);
 
-  const route_pages = (ctx, next) => {
+  async function route_pages(ctx, next) {
     let hash: string = ctx.hash;
     if (hash.includes("discuss")) {
       page = Discussions;
       let slash_index = hash.indexOf("/") + 1;
       let path = hash.slice(slash_index, hash.length);
       let title = convert_to_title(path);
-      params = { title: title };
+      discussion_title = title;
     } else {
       //user is on a problem page or the home page
-      let saved: ProblemSet[] | null = JSON.parse(localStorage.getItem("save"));
-
+      // the gen() function was probably not serialized
+      let saved: ProblemSetData[] | null = JSON.parse(
+        localStorage.getItem("save")
+      );
       if (saved) {
-        //use the save to overwrite the orignal problems
-        //maybe it should only overwrite the ones that need overriding rather than the entire thing
-        merged = TOC.map((curr, index) => {
-          let tmp = curr.num_of_problems;
-          //shallow copy, hence we assign to tmp
-          let res = Object.assign(curr, saved[index]);
-          // it should not override numb of problems generation prop since that shoud always be from the TOC
-          res.num_of_problems = tmp;
-          return res;
-        });
+        merged = merge_gen_funcs(diff_latest(TOC, saved), TOC);
       }
       section = merged.find((item) => {
         return convert_to_hash(item.title) === hash;
       });
       if (section !== undefined) {
         page = ProblemSet;
-        params = section;
-        if (params.problems.length > 0) {
+        if (section.problems.length > 0) {
           // restore from save file
-          params.problems = params.problems;
+          section.problems = section.problems;
         } else if (section.gen !== undefined) {
           //if the problem set is randomly generated, generate some problems
-          params.problems = Array.from(new Array(section.num_of_problems), () =>
-            params.gen()
-          );
+          let generated = await section.gen();
+          section.problems = generated;
+          //re-assign for svelte reactivity or else the UI wont update
+          section.problems = section.problems;
         } else {
-          params.problems = params.problems;
+          console.warn("should not have gotten here! ");
+          section.problems = section.problems;
         }
-      } else if (course_home_hash) {
-        page = Home;
       } else {
         page = Home;
       }
     }
-  };
-  let root = "";
-  //for when you have a single domain but multiple courses on that domain/server where the vps distributes all the course static files(see server.js), e.g jestlearn.com/computers404 , jestlearn.com/how_to_code
-  router(`/${course_home_hash}`, (ctx, next) => {
+  }
+  //for when you have a single domain but multiple courses on that domain/server where the vps distributes all the course static files(see server.js), e.g jestlearn.com/computers404 , jestlearn.com/how_to_code , we will attempt to use this instead for the base path. The route below "/" will never run if this is the case
+  let course_base_path = `/${convert_to_hash(COURSE_NAME)}/`;
+
+  router(`${course_base_path}`, (ctx, next) => {
     route_pages(ctx, next);
-    root = `/${course_home_hash}`;
   });
-  //for when the initial static file get req is just the root domain, e.g when hosting on github pages or netlify, learnhowtocode.com/
+  //if your course is on  a single domain e.g learnhowtocode.com/ hosted on github pages or something, then we will set the base path to /
+
   router(`/`, (ctx, next) => {
     route_pages(ctx, next);
-    root = ``;
+    course_base_path = "/";
   });
   router("/discuss", () => {
     page = Discussions;
   });
 
   router.start();
+
+  function filter_non_worked_on(arr: ProblemSetData[]) {
+    return arr.filter((val) => val.last_updated > 0);
+  }
 </script>
 
 {#if page !== Home}
   <nav class="home-alignment">
-    <a href={`/${course_home_hash}`}>🏠Home</a>
+    <a href={`${course_base_path}`}>🏠Home</a>
   </nav>
 {/if}
 
 <main class="flex-placement">
   <svelte:component
     this={page}
-    base_path={root}
-    {params}
-    title={params ? params.title : ""}
-    data={params}
+    base_path={course_base_path}
+    title={discussion_title}
+    data={section}
     on:save={(diff_with) => {
       let server_data = diff_with.detail;
       if (server_data !== null && server_data.problems !== undefined) {
@@ -132,11 +126,14 @@
       }
       //merge back the toc tags and stuff
       merged = diff_latest(merged, TOC_original);
-      localStorage.setItem("save", JSON.stringify(merged));
+      //todo: dont save the ones that are last_upadted 0?
+      localStorage.setItem(
+        "save",
+        JSON.stringify(filter_non_worked_on(merged))
+      );
       //todo: diff with server copy and then upload to server
       //server should only store old finished attempts for analytics, e.g when the reset button is hit, so need to distuginish
       console.log("LOG: SAVING");
-      //let saved = localStorage.getItem("save");
     }}
   />
 </main>

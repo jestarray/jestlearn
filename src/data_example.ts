@@ -66,8 +66,7 @@ let e_choice_code = new Problem(
 
 let example_multi_choice = new ProblemSet(
   "Example Multi Choice",
-  0,
-  2,
+  1,
   ["tag1", "tag2"],
   undefined,
   [e_choice, e_choice2, e_choice_code],
@@ -77,17 +76,22 @@ let example_multi_choice = new ProblemSet(
   ]
 );
 
+// min and max are inclusive
+function ran_int(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function ran_bool() {
+  return (ran_int(0, 1) == 1);
+}
+
 let example_generate = new ProblemSet(
   "Example Input RanGen: Binary To Decimal",
-  1.0,
-  5,
+  2.0,
   ["additionalsearcheterms", "convert"],
-  function generate_binary_to_decimal() {
-    function ran_int(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min + 1) + min);
-    }
+  function generate_binary_to_decimal(amount = 5) {
     function normalize_bwidth(num, width) {
       // zero shift right converts the number to a signed 32 bit number?
       let binary = (num >>> 0).toString(2);
@@ -110,12 +114,12 @@ let example_generate = new ProblemSet(
     }
     let num = ran_int(0, 255);
     let binary = normalize_bwidth(num, 8);
-    return new Problem(
+    return Array(amount).fill(new Problem(
       "input",
       `<h2>Convert ${subscript(binary, 2)} to decimal?</h2>`,
       parseInt(binary, 2).toString(),
       "Answer ex: 3"
-    );
+    ));
   },
   [],
   [
@@ -128,7 +132,42 @@ let example_generate = new ProblemSet(
   ]
 );
 
-let all: ProblemSet[] = [example_multi_choice, example_generate];
+let example_rest_api = new ProblemSet(
+  "Racket Expressions",
+  3.0,
+  ["additionalsearcheterms", "convert"],
+  async function get_it() {
+    let id = 0;
+    let amount = 5;
+    let response = await fetch("http://jestlearn.com/exercise", {
+      method: "POST",
+      headers: {
+      "Content-Type": "application/json",
+      },
+      body: JSON.stringify({"id": id, "amount": amount})
+    });
+    let result = await response.json();
+    return result;
+  },
+  [],
+  [
+    {
+      url_title: "article",
+      url: "https://computers404.netlify.app/06-binarynumbers",
+      additional: "",
+    },
+    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+  ]
+);
+
+function pick_random_el(arr: any[]) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+let all: ProblemSet[] = [
+  example_multi_choice,
+  example_generate,
+  example_rest_api,
+];
 //WARNING: do not stringify this! we need the gen function and a copy of the original questions for resetting and other things
 export const TOC_original: ProblemSet[] = all.map((val) => Object.freeze(val));
 
@@ -143,5 +182,5 @@ export let TOC: ProblemSet[] = JSON.parse(JSON.stringify(all)).map(
   }
 );
 //window.toc = TOC;
-//the home page of your course will be at https://yourdomain.com/example_course , where example_course is the name of the course(all spaces are replaced by underscores) to avoid making a get req to the server
+//the home page of your course will be at https://yourdomain.com/example_course , where example_course is the name of the course(all spaces are replaced by underscores) 
 export const COURSE_NAME = "example course";

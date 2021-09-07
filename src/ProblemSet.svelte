@@ -38,7 +38,7 @@
     </span>
   {/each}
   {#if data.problems.length <= 0}
-    <h2>Could not fetch/create data :(</h2>
+    <h2>Loading...</h2>
   {:else if current_problem.type === "input"}
     <InputProblem
       reset={reset_input_answer}
@@ -67,7 +67,7 @@
     {#if enable_next_button}
       <button
         class="button"
-        on:click={() => {
+        on:click={async function reset() {
           if (data.problem_index < data.problems.length - 1) {
             data.problem_index += 1;
             enable_next_button = false;
@@ -84,11 +84,9 @@
                 is_valid = false;
                 finished_all_problems = false;
                 if (data.gen) {
-                  let arr = [];
-                  for (let i = 0; i < data.num_of_problems; i++) {
-                    arr.push(data.gen());
-                  }
-                  data.problems = arr;
+                  let generated = await data.gen();
+                  data.problems = generated;
+                  data.problems = data.problems;
                 } else {
                   //if the TOC data updates and the user resets the problem, they will get the latest TOC version rather than having an old version of a non-updated TOC
                   let cloned = JSON.parse(JSON.stringify(TOC_original)).find(

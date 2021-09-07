@@ -1,4 +1,4 @@
-import { ProblemSet, Problem } from "./ProblemSet";
+import { ProblemSet, Problem, gen_amount } from "./ProblemSet";
 
 /// inclusive range
 export function ran_int(min, max) {
@@ -253,49 +253,51 @@ let binary_num_resources = [
   { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
 ];
 
+
+
 export let all = [
   new ProblemSet(
     "Binary To Decimal",
     0.0,
-    5,
     [],
-    generate_binary_to_decimal,
+    gen_amount(5, generate_binary_to_decimal),
     [],
     binary_num_resources
   ),
   new ProblemSet(
     "Decimal To Binary",
     0.1,
-    5,
     [],
-    generate_decimal_to_binary,
+    gen_amount(5, generate_decimal_to_binary),
     [],
     binary_num_resources
   ),
-  new ProblemSet("Binary to Hex", 2.1, 5, [], generate_binary_to_hex),
-  new ProblemSet("Hex to Binary", 2.1, 5, [], generate_hex_to_binary),
-  new ProblemSet("Decimal to Hex", 2.3, 5, [], generate_decimal_to_hex),
-  new ProblemSet("Hex to Decimal", 2.3, 5, [], generate_hex_to_decimal),
+  new ProblemSet("Binary to Hex", 2.1, [], gen_amount( 5, generate_binary_to_hex)),
+  new ProblemSet("Hex to Binary", 2.1, [], gen_amount(5,generate_hex_to_binary)),
+  new ProblemSet(
+    "Decimal to Hex",
+    2.3,
+    [],
+    gen_amount(5, generate_decimal_to_hex)
+  ),
+  new ProblemSet("Hex to Decimal", 2.3, [], gen_amount(5, generate_hex_to_decimal)),
   new ProblemSet(
     "Bitwise Operations",
     2.8,
-    5,
     [],
-    generate_bitwise_vec_operations
+    gen_amount(5, generate_bitwise_vec_operations)
   ),
   new ProblemSet(
     "Bitshifting (arithmetic and logical)",
     2.16,
-    20,
     [],
-    generate_bitwise_shift
+    gen_amount(20, generate_bitwise_shift)
   ),
   new ProblemSet(
     "Binary Addition(unsigned)",
     2.17,
-    10,
     [],
-    function gen_binary_addtion_unsigned() {
+    gen_amount(10, function gen_binary_addtion_unsigned() {
       let bit_width = ran_int(4, 8);
       let UMAX = Math.pow(2, bit_width) - 1;
 
@@ -328,7 +330,7 @@ export let all = [
         `${answer}`,
         "If there are two answers, write the one with the highest number first comma second answer e.g 10,3"
       );
-    },
+    }),
     [],
     [
       {
@@ -346,9 +348,8 @@ export let all = [
   new ProblemSet(
     "Decimal to Binary(two's complement)",
     2.17,
-    10,
     [],
-    generate_decimal_to_twoscomp,
+    gen_amount(10, generate_decimal_to_twoscomp),
     [],
     [
       {
@@ -356,15 +357,18 @@ export let all = [
         url: "https://computers404.ml/07-negative_numbers_twos_complement",
         additional: "",
       },
-      { url_title: "video", url: "https://youtu.be/Q32TDUTGfQM", additional: "" },
+      {
+        url_title: "video",
+        url: "https://youtu.be/Q32TDUTGfQM",
+        additional: "",
+      },
     ]
   ),
   new ProblemSet(
     "Binary to Decimal(unsigned and signed twos compl)",
     2.19,
-    10,
     [],
-    generate_twoscomp_to_deci,
+    gen_amount(10, generate_twoscomp_to_deci),
     [],
     [
       {
@@ -372,15 +376,18 @@ export let all = [
         url: "https://computers404.ml/07-negative_numbers_twos_complement",
         additional: "",
       },
-      { url_title: "video", url: "https://youtu.be/Q32TDUTGfQM", additional: "" },
+      {
+        url_title: "video",
+        url: "https://youtu.be/Q32TDUTGfQM",
+        additional: "",
+      },
     ]
   ),
   new ProblemSet(
     "Binary Subtraction(two's complement)",
     2.19,
-    10,
     [],
-    function gen_sub_problem() {
+    gen_amount(10, function gen_sub_problem() {
       //twos complement only! no need to do unsigned + signed
       let bit_width = ran_int(4, 8);
       let TMIN = -(Math.pow(2, bit_width) / 2 - 1);
@@ -408,14 +415,13 @@ export let all = [
         `${d1}+${d2}=${answer}`,
         "answer hint: -3+4=1"
       );
-    }
+    })
   ),
   new ProblemSet(
     "Signed Overflow",
     2.29,
-    10,
     [],
-    function gen_signed_overflow_prob() {
+    gen_amount(10, function gen_signed_overflow_prob() {
       //twos complement only! no need to do unsigned + signed
       let bit_width = ran_int(4, 8);
       //this will never overflow! maybe do a seperate exercise about overflow
@@ -463,7 +469,7 @@ export let all = [
         `${d1}+${d2}=${answer}`,
         "answer hint: -3+4=1"
       );
-    }
+    })
   ),
 ];
 

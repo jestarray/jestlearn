@@ -1,7 +1,7 @@
 <script type="ts">
   export let data;
   export let reset;
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, afterUpdate } from "svelte";
   const dispatch = createEventDispatcher();
   export let input_answer = "";
   export let show_answer_option;
@@ -18,6 +18,9 @@
     return is_correct;
   });
   $: dispatch("valid-input", input_answer.length > 0);
+  afterUpdate(() => {
+    Prism.highlightAll();
+  });
 </script>
 
 <div>

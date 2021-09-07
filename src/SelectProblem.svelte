@@ -77,9 +77,12 @@
 
 <style>
   label {
-    border: 1px solid grey;
+    border: 2px solid grey;
     border-radius: 25px;
     padding: 1em;
-    margin: 2px;
+    margin: 4px;
+  }
+  label:hover {
+    border: 2px solid blue;
   }
 </style>

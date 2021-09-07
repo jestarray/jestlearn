@@ -72,6 +72,7 @@
         bind:value={username}
       /><button
         on:click={function login() {
+          //validate username form
           if (username.length > 0) {
             let server_save_cache =
               JSON.parse(localStorage.getItem("save_server")) || [];
@@ -79,6 +80,7 @@
               //logging in with a different user
               server_save_cache = [];
             }
+            //send the problems worked on to the server
             send_sync(
               username.toLowerCase().trim(),
               TOC,
@@ -87,10 +89,8 @@
             )
               .then((x) => {
                 x.code = Sync.INITIAL;
-                //console.log(x);
                 dispatch("save", x);
                 //force page refresh after save to update the homepage
-                // but it will delte the username...
                 location.reload();
               })
               .catch((err) => {
@@ -154,7 +154,7 @@
           >
         </td>
         <td
-          ><a href={`${base_path}/#discuss/${convert_to_hash(item.title)}`}
+          ><a href={`${base_path}#discuss/${convert_to_hash(item.title)}`}
             >Github</a
           ></td
         >
@@ -175,7 +175,7 @@
       </tr>
     {/each}
   </table>
-  <a href="https://github.com/jestarray/jestlearn">Source Code v0.0.2</a>
+  <a href="https://github.com/jestarray/jestlearn">Source Code v0.0.3</a>
   |
   <a href="https://www.patreon.com/jestarray/">Support my work on Patreon!</a>
   | <a href="https://www.jestlearn.com/">Other courses</a>

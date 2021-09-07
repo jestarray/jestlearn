@@ -33,35 +33,30 @@ export class Problem {
 
 export class ProblemSet {
   title: string;
+  ///ids must be unique!
   id: number;
   problem_index: number;
-  num_of_problems: number;
   tags: string[];
-  //if you aren't generating problems, stick it in the data field
+  // if you are not randomly generating problems, stick them in .problems
   problems: Problem[];
+  //otherwise you are, so provide a function that returns an array of problems, or an async function if you need to fetch from an api
   gen: Function | undefined;
-  resources: { url_title: string; url: string, additional: string}[]; //ray of links to theoretical content, additional can be some html though its not recommended because its better to have things open in a new tab rather than needing to keep popping the modal on and off
+  resources: { url_title: string; url: string; additional: string }[]; //ray of links to theoretical content, additional can be some html though its not recommended because its better to have things open in a new tab rather than needing to keep popping the modal on and off
   emoji_mark: string;
   last_updated: number;
   constructor(
     title: string,
     id: number,
-    num_of_problems: number = 1,
     tags: string[],
     gen: Function | undefined,
     problems: Problem[] = [],
-    resources: { url_title: string; url: string, additional: string}[] = [],
+    resources: { url_title: string; url: string; additional: string }[] = [],
     emoji_mark: string = "❓"
   ) {
     this.title = title;
     this.id = id;
     this.problem_index = 0;
     this.problems = problems;
-    if (problems.length > 0) {
-      this.num_of_problems = problems.length;
-    } else {
-      this.num_of_problems = num_of_problems;
-    }
     this.tags = tags;
     this.gen = gen;
     this.resources = resources;
@@ -76,4 +71,27 @@ export function has_started(problems: Problem[]): boolean {
     }
   }
   return false;
+}
+
+//adds back the gen() functions that were not seralized
+export function merge_gen_funcs(without: ProblemSet[], original: ProblemSet[]): ProblemSet[] {
+  return without.map((val) => {
+    let found = original.find((hay) => val.id === hay.id);
+    if(found) {
+      val.gen = found.gen;
+      return val;
+    } else {
+      return val;
+    }
+  })
+}
+
+export function gen_amount(amount = 1, f: () => Problem): () => Problem[] {
+  return function g() {
+    let res = [];
+    for(let i = 0; i < amount; i++){
+      res.push(f());
+    }
+    return res;
+  };
 }
