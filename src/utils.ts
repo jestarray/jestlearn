@@ -26,7 +26,7 @@ export function diff_latest(set_a: ProblemSet[], set_b: ProblemSet[]) {
   for (const item of smaller) {
     let is_unique = true;
     for (const item2 of bigger) {
-      if (item.id === item2.id || item.title === item2.title) {
+      if (item.title === item2.title) {
         is_unique = false;
         break;
       }
@@ -39,7 +39,7 @@ export function diff_latest(set_a: ProblemSet[], set_b: ProblemSet[]) {
   let diffed = bigger.map((val) => {
     let keep = val;
     for (const val2 of smaller) {
-      if (val.id == val2.id && val.last_updated < val2.last_updated) {
+      if (val.title == val2.title && val.last_updated < val2.last_updated) {
         keep = val2;
         break;
       }
@@ -59,7 +59,7 @@ export async function send_sync(username, TOC, server_copy = [], code = 0):Promi
     username: username,
     problem_sets: dlatest
       .filter((val, index) => {
-        let serv = server_copy.find((i) => i.id === val.id);
+        let serv = server_copy.find((i) => i.title === val.title);
         let update_server_sync = false;
         if (serv) {
           update_server_sync = serv.last_updated < val.last_updated;

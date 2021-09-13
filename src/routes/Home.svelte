@@ -48,6 +48,10 @@
   if (server_save_cache) {
     username = server_save_cache.username;
   }
+  function delete_data() {
+    localStorage.removeItem("save_server");
+    localStorage.removeItem("save");
+  }
 </script>
 
 <div>
@@ -60,8 +64,7 @@
       <button
         class="logout-button"
         on:click={() => {
-          localStorage.removeItem("save_server");
-          localStorage.removeItem("save");
+          delete_data();
           location.reload();
         }}>Logout</button
       >
@@ -166,10 +169,20 @@
       </tr>
     {/each}
   </table>
-  <a href="https://github.com/jestarray/jestlearn">Source Code v0.0.4</a>
+  <a href="https://github.com/jestarray/jestlearn">v0.0.5</a>
   |
   <a href="https://www.patreon.com/jestarray/">Support my work on Patreon!</a>
   | <a href="https://www.jestlearn.com/">Other courses</a>
+  |
+  <a
+    href="#/"
+    on:click={() => {
+      //todo: should send a req to the server deleting user data also?
+      //mainly for malformed sync data
+      delete_data();
+      location.reload();
+    }}>Reset All</a
+  >
 </div>
 
 <style>

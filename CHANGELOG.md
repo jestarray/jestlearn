@@ -1,3 +1,12 @@
+# 0.0.5
+- Now titles are used for comparisons rather than ids since ids are hard to make unique and are tied to section-ids(maybe crc32 the titles for uids)
+- Prevent re-doing of problems that are already marked correct when the user did not click "Next" to proceed.
+- Added clear cache button
+- Added show answer button
+- Added cloudflare analytics
+- Input answers are now space insensitive
+- Input answer hints now can take html
+- Breaking ProblemSet constructor because search tags are kinda optional and should be last
 # 0.0.4
 - Fixed TOC not updating
 - Merged back other deleted props rather than just .gen()

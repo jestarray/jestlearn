@@ -1,5 +1,22 @@
 import { object_without_properties } from "svelte/internal";
 import { ProblemSet, Problem, gen_amount } from "./ProblemSet";
+
+function fetch_problems(id: number = 0, amount = 5) {
+return async function get_it() {
+    //const fetch_url = "http://localhost:3000/exercise";
+    const fetch_url = "https://jestlearn.com/exercise";
+    let response = await fetch(fetch_url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: id, amount: amount }),
+    });
+    let result = await response.json();
+    return result;
+  }
+}
+
 /// min and max are inclusive
 function ran_int(min = 0, max = 1) {
   min = Math.ceil(min);
@@ -12,22 +29,24 @@ function ran_bool() {
 }
 
 let racket_math_expressions = new ProblemSet(
-  "Expressions, Numbers, and Evaluation",
+  "Expressions and Evaluation with numbers",
   2.0,
+  fetch_problems(0, 10),
   [],
-  async function get_it() {
-    let id = 0;
-    let amount = 10;
-    let response = await fetch("https://jestlearn.com/exercise", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: id, amount: amount }),
-    });
-    let result = await response.json();
-    return result;
-  },
+  [
+    {
+      url_title: "article",
+      url: "https://jesthowtocode.netlify.app/expressions.html",
+      additional: "",
+    },
+    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+  ]
+);
+
+let infix_to_prefix = new ProblemSet(
+  "Translate infix to prefix math",
+  2.1,
+  fetch_problems(2.1, 10),
   [],
   [
     {
@@ -42,8 +61,7 @@ let racket_math_expressions = new ProblemSet(
 let racket_string_practice = new ProblemSet(
   "Zero based indexing string practice",
   2.2,
-  [],
-  gen_amount(10, function get_it() {
+  gen_amount(10, function gen_problem() {
     let ran_words = [
       "StRiKeBrEaKeR",
       "InVeStIgAtIoN",
@@ -105,11 +123,70 @@ let racket_string_practice = new ProblemSet(
   ]
 );
 
+let ran_var_arith = new ProblemSet(
+  "Variable arith evaluation",
+  2.3,
+  fetch_problems(2.3, 10),
+  [],
+  [
+    {
+      url_title: "article",
+      url: "https://jesthowtocode.netlify.app/expressions.html",
+      additional: "",
+    },
+    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+  ]
+);
+
+let build_a_string = new ProblemSet(
+  "Build a string",
+  2.4,
+  fetch_problems(2.4, 10),
+  [],
+  [
+    {
+      url_title: "article",
+      url: "https://jesthowtocode.netlify.app/expressions.html",
+      additional: "",
+    },
+    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+  ]
+);
+
+let comparisons = new ProblemSet(
+  "If bool comparisons",
+  2.5,
+  fetch_problems(2.5, 10),
+  [],
+  [
+    {
+      url_title: "article",
+      url: "https://jesthowtocode.netlify.app/expressions.html",
+      additional: "",
+    },
+    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+  ]
+);
+
+let logical = new ProblemSet(
+  "If logical",
+  2.6,
+  fetch_problems(2.6, 10),
+  [],
+  [
+    {
+      url_title: "article",
+      url: "https://jesthowtocode.netlify.app/expressions.html",
+      additional: "",
+    },
+    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+  ]
+);
 
 function pick_random_el(arr: any[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-let all: ProblemSet[] = [racket_math_expressions, racket_string_practice];
+let all: ProblemSet[] = [racket_math_expressions, infix_to_prefix, racket_string_practice, ran_var_arith, build_a_string, comparisons, logical];
 //WARNING: do not stringify this! we need the gen function and a copy of the original questions for resetting and other things
 export const TOC_original: ProblemSet[] = all.map((val) => Object.freeze(val));
 

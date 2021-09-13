@@ -29,7 +29,7 @@ export class Problem {
 
 export class ProblemSet {
   title: string;
-  ///ids must be unique!
+  ///id is for section identification
   id: number;
   problem_index: number;
   tags: string[];
@@ -43,11 +43,11 @@ export class ProblemSet {
   constructor(
     title: string,
     id: number,
-    tags: string[],
     gen: Function | undefined,
     problems: Problem[] = [],
     resources: { url_title: string; url: string; additional: string }[] = [],
-    emoji_mark: string = "❓"
+    tags: string[] = [],
+    emoji_mark: string = "❓",
   ) {
     this.title = title;
     this.id = id;
@@ -72,7 +72,7 @@ export function has_started(problems: Problem[]): boolean {
 //adds back the gen() functions that were not seralized
 export function merge_back_deleted_props(without: ProblemSet[], original: ProblemSet[]): ProblemSet[] {
   return without.map((val) => {
-    let found = original.find((hay) => val.id === hay.id);
+    let found = original.find((hay) => val.title === hay.title);
     if(found) {
       val.gen = found.gen;
       val.resources = found.resources;

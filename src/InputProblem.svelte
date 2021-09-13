@@ -12,9 +12,13 @@
     // using coersion here. might have to handle cases where evaluation of the expression needs to be done before checking answer
     // or force everyone to genereate the json evaluted??
     //console.log(data.answer);
+    //answer can optionally be space insensitive
+
     let is_correct =
       data.answer == input_answer ||
-      data.answer.toString().toLowerCase() == input_answer.toLowerCase();
+      data.answer.toString().toLowerCase() == input_answer.toLowerCase() ||
+      data.answer.toString().replace(/\s/g, "") ===
+        input_answer.replace(/\s/g, "");
     return is_correct;
   });
   $: dispatch("valid-input", input_answer.length > 0);
@@ -28,7 +32,9 @@
   <div>
     {@html data.question}
   </div>
-  <p>{data.input_answer_hint}</p>
+  <p>
+    {@html data.input_answer_hint}
+  </p>
   <input
     type="text"
     bind:value={input_answer}
@@ -40,8 +46,14 @@
   />
   {#if show_answer_option}
     <details>
-      <summary>show answer</summary>
+      <summary><span class="red">show answer</span></summary>
       {data.answer}
     </details>
   {/if}
 </div>
+
+<style>
+  .red {
+    color: red;
+  }
+</style>

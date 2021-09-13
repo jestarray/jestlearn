@@ -253,13 +253,10 @@ let binary_num_resources = [
   { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
 ];
 
-
-
 export let all = [
   new ProblemSet(
     "Binary To Decimal",
     0.0,
-    [],
     gen_amount(5, generate_binary_to_decimal),
     [],
     binary_num_resources
@@ -267,36 +264,27 @@ export let all = [
   new ProblemSet(
     "Decimal To Binary",
     0.1,
-    [],
     gen_amount(5, generate_decimal_to_binary),
     [],
     binary_num_resources
   ),
-  new ProblemSet("Binary to Hex", 2.1, [], gen_amount( 5, generate_binary_to_hex)),
-  new ProblemSet("Hex to Binary", 2.1, [], gen_amount(5,generate_hex_to_binary)),
-  new ProblemSet(
-    "Decimal to Hex",
-    2.3,
-    [],
-    gen_amount(5, generate_decimal_to_hex)
-  ),
-  new ProblemSet("Hex to Decimal", 2.3, [], gen_amount(5, generate_hex_to_decimal)),
+  new ProblemSet("Binary to Hex", 2.1, gen_amount(5, generate_binary_to_hex)),
+  new ProblemSet("Hex to Binary", 2.1, gen_amount(5, generate_hex_to_binary)),
+  new ProblemSet("Decimal to Hex", 2.3, gen_amount(5, generate_decimal_to_hex)),
+  new ProblemSet("Hex to Decimal", 2.3, gen_amount(5, generate_hex_to_decimal)),
   new ProblemSet(
     "Bitwise Operations",
     2.8,
-    [],
     gen_amount(5, generate_bitwise_vec_operations)
   ),
   new ProblemSet(
     "Bitshifting (arithmetic and logical)",
     2.16,
-    [],
     gen_amount(20, generate_bitwise_shift)
   ),
   new ProblemSet(
     "Binary Addition(unsigned)",
     2.17,
-    [],
     gen_amount(10, function gen_binary_addtion_unsigned() {
       let bit_width = ran_int(4, 8);
       let UMAX = Math.pow(2, bit_width) - 1;
@@ -348,7 +336,6 @@ export let all = [
   new ProblemSet(
     "Decimal to Binary(two's complement)",
     2.17,
-    [],
     gen_amount(10, generate_decimal_to_twoscomp),
     [],
     [
@@ -367,7 +354,6 @@ export let all = [
   new ProblemSet(
     "Binary to Decimal(unsigned and signed twos compl)",
     2.19,
-    [],
     gen_amount(10, generate_twoscomp_to_deci),
     [],
     [
@@ -386,7 +372,6 @@ export let all = [
   new ProblemSet(
     "Binary Subtraction(two's complement)",
     2.19,
-    [],
     gen_amount(10, function gen_sub_problem() {
       //twos complement only! no need to do unsigned + signed
       let bit_width = ran_int(4, 8);
@@ -420,7 +405,6 @@ export let all = [
   new ProblemSet(
     "Signed Overflow",
     2.29,
-    [],
     gen_amount(10, function gen_signed_overflow_prob() {
       //twos complement only! no need to do unsigned + signed
       let bit_width = ran_int(4, 8);

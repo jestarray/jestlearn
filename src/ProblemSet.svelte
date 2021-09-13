@@ -10,10 +10,19 @@
 
   export let data: ProblemSet;
   const dispatch = createEventDispatcher();
-
+  function check_already_answered_beforehand() {
+    if (data.problems.length > 0) {
+      return (
+        data.problems[data.problem_index].result === "✅" ||
+        data.problems[data.problem_index].result === "⚠️"
+      );
+    } else {
+      return false;
+    }
+  }
   let check_answer;
-  let is_valid = false;
-  let enable_next_button = false;
+  let is_valid = false || check_already_answered_beforehand();
+  let enable_next_button = false || check_already_answered_beforehand();
   /*  let problem_index =
     progress.indexOf(Result.UNANSWERED) !== -1
       ? progress.indexOf(Result.UNANSWERED)
@@ -28,6 +37,12 @@
     reset_input_answer = false;
     data.problems[data.problem_index].tries += 1;
     if (check_answer && check_answer()) {
+      if (check_already_answered_beforehand()) {
+        //we already did this problem so just enable the next button and return early
+
+        enable_next_button = true;
+        return;
+      }
       if (data.problems[data.problem_index].tries == 1) {
         //got it right on the first try
         data.problems[data.problem_index].result = "✅";
@@ -94,6 +109,9 @@
     dispatch("save", { code: code });
     reset_input_answer = true;
   }
+  /* TODO:
+  CONSIDER REMOVING INPUTPROBLEM AND SELECT PROBLEM NEEDING TO COMMUNICATE BACK UP HERE!
+  UPDATE-CHECK EVENTS SHOULD BE CONTAINED IN THOSE FILES INSTEAD? Would need to refactor them so they can take an entire array of problems rather than being passed down 1 and having this file control everything*/
 </script>
 
 <title>{data.title}</title>

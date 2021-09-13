@@ -67,13 +67,13 @@ let e_choice_code = new Problem(
 let example_multi_choice = new ProblemSet(
   "Example Multi Choice",
   1,
-  ["tag1", "tag2"],
   undefined,
   [e_choice, e_choice2, e_choice_code],
   [
     { url_title: "📄 articles", url: "https://google.com", additional: "" },
     { url_title: "🎥 video", url: "https://youtube.com", additional: "" },
-  ]
+  ],
+  ["tag1", "tag2"],
 );
 
 // min and max are inclusive
@@ -90,7 +90,6 @@ function ran_bool() {
 let example_generate = new ProblemSet(
   "Example Input RanGen: Binary To Decimal",
   2.0,
-  ["additionalsearcheterms", "convert"],
   function generate_binary_to_decimal(amount = 5) {
     function normalize_bwidth(num, width) {
       // zero shift right converts the number to a signed 32 bit number?
@@ -129,13 +128,13 @@ let example_generate = new ProblemSet(
       additional: "",
     },
     { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
-  ]
+  ],
+  ["additionalsearcheterms", "convert"],
 );
 
 let example_rest_api = new ProblemSet(
   "Racket Expressions",
   3.0,
-  ["additionalsearcheterms", "convert"],
   async function get_it() {
     let id = 0;
     let amount = 5;
@@ -157,7 +156,8 @@ let example_rest_api = new ProblemSet(
       additional: "",
     },
     { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
-  ]
+  ],
+  ["additionalsearcheterms", "convert"],
 );
 
 function pick_random_el(arr: any[]) {
