@@ -183,10 +183,40 @@ let logical = new ProblemSet(
   ]
 );
 
+let func_scope_eval = new ProblemSet(
+  "Function Evaluation and Scope 1",
+  2.7,
+  fetch_problems(2.7, 10),
+  [],
+  [
+    {
+      url_title: "article",
+      url: "https://jesthowtocode.netlify.app/expressions.html",
+      additional: "",
+    },
+    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+  ]
+);
+
+let func_scope_eval_2 = new ProblemSet(
+  "Function Evaluation and Scope 2 nested",
+  2.8,
+  fetch_problems(2.8, 10),
+  [],
+  [
+    {
+      url_title: "article",
+      url: "https://jesthowtocode.netlify.app/expressions.html",
+      additional: "",
+    },
+    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+  ]
+);
+
 function pick_random_el(arr: any[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-let all: ProblemSet[] = [racket_math_expressions, infix_to_prefix, racket_string_practice, ran_var_arith, build_a_string, comparisons, logical];
+let all: ProblemSet[] = [racket_math_expressions, infix_to_prefix, racket_string_practice, ran_var_arith, build_a_string, comparisons, logical, func_scope_eval, func_scope_eval_2];
 //WARNING: do not stringify this! we need the gen function and a copy of the original questions for resetting and other things
 export const TOC_original: ProblemSet[] = all.map((val) => Object.freeze(val));
 

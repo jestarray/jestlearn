@@ -169,9 +169,12 @@
       </tr>
     {/each}
   </table>
-  <a href="https://github.com/jestarray/jestlearn">v0.0.5</a>
+  <a href="https://github.com/jestarray/jestlearn">v0.0.6</a>
+  |
+  <a href="https://www.youtube.com/c/jestarray">Youtube</a>
   |
   <a href="https://www.patreon.com/jestarray/">Support my work on Patreon!</a>
+  | <a href="https://forms.gle/ehWtqgfmnv5N7c3e8">Survey</a>
   | <a href="https://www.jestlearn.com/">Other courses</a>
   |
   <a
