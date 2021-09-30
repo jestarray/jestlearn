@@ -36,10 +36,10 @@ let racket_math_expressions = new ProblemSet(
   [
     {
       url_title: "article",
-      url: "https://jesthowtocode.netlify.app/expressions.html",
+      url: "https://howtocode.pages.dev/expressions",
       additional: "",
     },
-    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+    { url_title: "video", url: "https://youtu.be/nBUcisbrvTo", additional: "" },
   ]
 );
 
@@ -54,7 +54,7 @@ let infix_to_prefix = new ProblemSet(
       url: "https://jesthowtocode.netlify.app/expressions.html",
       additional: "",
     },
-    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+    { url_title: "video", url: "https://youtu.be/Nk2mpEgc2F0", additional: "" },
   ]
 );
 
@@ -116,10 +116,10 @@ let racket_string_practice = new ProblemSet(
   [
     {
       url_title: "article",
-      url: "https://jesthowtocode.netlify.app/strings.html",
+      url: "https://howtocode.pages.dev/strings#zero_based_indexing",
       additional: "",
     },
-    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+    { url_title: "video", url: "https://youtu.be/oddmn_fD_vU", additional: "" },
   ]
 );
 
@@ -131,10 +131,10 @@ let ran_var_arith = new ProblemSet(
   [
     {
       url_title: "article",
-      url: "https://jesthowtocode.netlify.app/expressions.html",
+      url: "https://howtocode.pages.dev/variables",
       additional: "",
     },
-    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+    { url_title: "video", url: "https://youtu.be/WViW7y17UhE", additional: "" },
   ]
 );
 
@@ -146,10 +146,10 @@ let build_a_string = new ProblemSet(
   [
     {
       url_title: "article",
-      url: "https://jesthowtocode.netlify.app/expressions.html",
+      url: "https://howtocode.pages.dev/variables",
       additional: "",
     },
-    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+    { url_title: "video", url: "https://youtu.be/bGdl11zoRlc", additional: "" },
   ]
 );
 
@@ -161,10 +161,10 @@ let comparisons = new ProblemSet(
   [
     {
       url_title: "article",
-      url: "https://jesthowtocode.netlify.app/expressions.html",
+      url: "https://howtocode.pages.dev/booleans",
       additional: "",
     },
-    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+    { url_title: "video", url: "https://youtu.be/_25wDPmuCKc", additional: "" },
   ]
 );
 
@@ -176,10 +176,10 @@ let logical = new ProblemSet(
   [
     {
       url_title: "article",
-      url: "https://jesthowtocode.netlify.app/expressions.html",
+      url: "https://howtocode.pages.dev/booleans",
       additional: "",
     },
-    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+    { url_title: "video", url: "https://youtu.be/O8c4arZ0FW8", additional: "" },
   ]
 );
 
@@ -213,10 +213,25 @@ let func_scope_eval_2 = new ProblemSet(
   ]
 );
 
+let structs_build = new ProblemSet(
+  "Structs",
+  2.9,
+  fetch_problems(2.9, 10),
+  [],
+  [
+    {
+      url_title: "article",
+      url: "https://jesthowtocode.netlify.app/expressions.html",
+      additional: "",
+    },
+    { url_title: "video", url: "https://youtu.be/bFLB4dyNKUk", additional: "" },
+  ]
+);
+
 function pick_random_el(arr: any[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
-let all: ProblemSet[] = [racket_math_expressions, infix_to_prefix, racket_string_practice, ran_var_arith, build_a_string, comparisons, logical, func_scope_eval, func_scope_eval_2];
+let all: ProblemSet[] = [racket_math_expressions, infix_to_prefix, racket_string_practice, ran_var_arith, build_a_string, comparisons, logical, func_scope_eval, func_scope_eval_2, structs_build];
 //WARNING: do not stringify this! we need the gen function and a copy of the original questions for resetting and other things
 export const TOC_original: ProblemSet[] = all.map((val) => Object.freeze(val));
 
