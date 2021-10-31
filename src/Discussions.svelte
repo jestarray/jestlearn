@@ -2,17 +2,39 @@
   export let title;
 </script>
 
-<title>{title}</title>
-<div class="utterances">
+<div>
+  <title>{title}</title>
+  <meta property="og:title" content={title} />
   <h1>{title + " Discussion"}</h1>
-  <p>Ask questions, suggest improvements, etc</p>
-  <script
-    src="https://utteranc.es/client.js"
-    repo="jestarray/jestlearn"
-    issue-term="title"
-    theme="github-light"
-    crossorigin="anonymous"
-    async>
-  </script>
-  <div class="utterance-frame" />
+  <h2>For assignment positions, please wrap your code within this block</h2>
+  <h3 style="color: red;">DO NOT EDIT YOUR SOLUTION BASED ON OTHERS</h3>
+  <pre>
+&lt;details&gt;
+
+<code>
+```scheme
+
+(define PASTE-CODE-HERE #true)
+
+```
+</code>
+&lt;/details&gt;
+</pre>
+  <div class="giscus">
+    <script
+      src="https://giscus.app/client.js"
+      data-repo="jestarray/howtocode"
+      data-repo-id="MDEwOlJlcG9zaXRvcnk0MDM3MTI1NTA="
+      data-category="Assignment Submissions"
+      data-category-id="DIC_kwDOGBAqJs4B_l8z"
+      data-mapping="og:title"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-theme="light"
+      data-lang="en"
+      crossorigin="anonymous"
+      async>
+    </script>
+    <div class="giscus-frame" />
+  </div>
 </div>

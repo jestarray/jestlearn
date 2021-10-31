@@ -1,3 +1,9 @@
+# 0.0.6
+- Switched to giscus using github discussion feature instead of issues(turns out utterances doesn't work at all due to re-direct)
+- Using giscus to store and review student submissions for now
+- TODO: when github discussions introduce templates, use those to force correct submission structure
+- Added code submission/discussion problems
+
 # 0.0.5
 - Now titles are used for comparisons rather than ids since ids are hard to make unique and are tied to section-ids(maybe crc32 the titles for uids)
 - Prevent re-doing of problems that are already marked correct when the user did not click "Next" to proceed.

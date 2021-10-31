@@ -134,7 +134,7 @@
                     .map((res) => {
                       return `<p>
                   <a href=${res.url} title=${res.url} target="_blank"
-                    >${res.url}
+                    >${res.url_title}
                   </a>
                   ${res.additional}
                 </p>`;

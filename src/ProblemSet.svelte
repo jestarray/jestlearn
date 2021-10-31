@@ -3,10 +3,11 @@
   import SelectProblem from "./SelectProblem.svelte";
   import { correct_answer_sound, wrong_answer_sound } from "./audio";
   import { createEventDispatcher } from "svelte";
-  import type { ProblemSet } from "./ProblemSet";
+  import { Problem, ProblemSet } from "./ProblemSet";
   import { TOC, TOC_original } from "./data";
   import Prism from "../public/prism";
   import { Sync } from "./utils";
+  import SubmissionProblem from "./SubmissionProblem.svelte";
 
   export let data: ProblemSet;
   const dispatch = createEventDispatcher();
@@ -136,6 +137,18 @@
       }}
       on:check-answer={enable_next_button ? reset : check}
     />
+  {:else if current_problem.type === "submission"}
+    <SubmissionProblem
+      title={data.title}
+      data={current_problem}
+      on:update-check={(event) => {
+        check_answer = event.detail;
+      }}
+      on:valid-input={(event) => {
+        is_valid = event.detail;
+      }}
+      on:check-answer={enable_next_button ? reset : check}
+    />
   {:else if current_problem.type === "select"}
     <SelectProblem
       data={current_problem}
@@ -153,7 +166,8 @@
       <button class="button" on:click={reset}
         >{finished_all_problems ? "Reset" : "Next"}</button
       >
-    {:else}
+      <!-- todo: actually submission problems could use a submit button if we want to store said submission in the database but for now i'm just explioting github discussions for these code assignment submissions -->
+    {:else if current_problem.type !== "submission"}
       <button
         class={is_valid ? "button" : "button disabled"}
         on:click={check}
