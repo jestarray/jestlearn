@@ -24,7 +24,7 @@
   <!--  <div class="giscus">
     <div class="giscus-frame" />
   </div> -->
-  <!--   <script
+  <script
     src="https://giscus.app/client.js"
     data-repo="jestarray/howtocode"
     data-repo-id="MDEwOlJlcG9zaXRvcnk0MDM3MTI1NTA="
@@ -36,8 +36,8 @@
     data-theme="light"
     data-lang="en"
     crossorigin="anonymous">
-  </script> -->
-  <Giscus
+  </script>
+  <!-- <Giscus
     repo="jestarray/howtocode"
     repoId="MDEwOlJlcG9zaXRvcnk0MDM3MTI1NTA"
     category="Assignment Submissions"
@@ -46,5 +46,5 @@
     reactionsEnabled="1"
     emitMetadata="0"
     theme="light"
-  />
+  /> -->
 </div>
