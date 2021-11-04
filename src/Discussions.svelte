@@ -1,6 +1,12 @@
 <script lang="ts">
   import { Giscus } from "@giscus/svelte";
   export let title;
+
+  import { createEventDispatcher, afterUpdate } from "svelte";
+  // todo: use server side rendering for highlighting the below codeblock?
+  afterUpdate(() => {
+    Prism.highlightAll();
+  });
 </script>
 
 <meta property="og:title" content={title} />
@@ -12,7 +18,7 @@
   <pre>
 &lt;details&gt;
 
-<code>
+<code class="language-html">
 ```scheme
 
 (define PASTE-CODE-HERE #true)
