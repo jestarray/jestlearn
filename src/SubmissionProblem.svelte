@@ -31,7 +31,7 @@
   <div>
     {@html data.question}
   </div>
-  <Discussions {title} />
+  <Discussions {title} submission={true} />
 </div>
 
 <style>
