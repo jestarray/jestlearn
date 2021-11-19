@@ -48,7 +48,7 @@
     data-mapping="og:title"
     data-reactions-enabled="1"
     data-emit-metadata="0"
-    data-theme="light"
+    data-theme="https://jestlearn.com/how_to_code/giscus.css"
     data-lang="en"
     crossorigin="anonymous">
   </script>
