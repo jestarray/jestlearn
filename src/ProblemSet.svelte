@@ -167,7 +167,7 @@
         >{finished_all_problems ? "Reset" : "Next"}</button
       >
       <!-- todo: actually submission problems could use a submit button if we want to store said submission in the database but for now i'm just explioting github discussions for these code assignment submissions -->
-    {:else if current_problem.type !== "submission"}
+    {:else if current_problem != undefined && current_problem.type !== "submission"}
       <button
         class={is_valid ? "button" : "button disabled"}
         on:click={check}

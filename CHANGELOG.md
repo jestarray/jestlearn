@@ -1,3 +1,7 @@
+# 0.6.1
+- Critical Fix bug where problems would not generate at all
++ Fixed semantic versioning
+
 # 0.0.6
 - Switched to giscus using github discussion feature instead of issues(turns out utterances doesn't work at all due to re-direct)
 - Using giscus to store and review student submissions for now

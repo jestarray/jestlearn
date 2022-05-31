@@ -169,7 +169,7 @@
       </tr>
     {/each}
   </table>
-  <a href="https://github.com/jestarray/jestlearn">v0.0.6</a>
+  <a href="https://github.com/jestarray/jestlearn">v0.6.1</a>
   |
   <a href="https://www.youtube.com/c/jestarray">Youtube</a>
   |
