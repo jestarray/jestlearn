@@ -18,8 +18,9 @@
 <div>
   <title>{title}</title>
   <h1>{title + " Discussion"}</h1>
-  <h2>For assignment positions, please wrap your code within this block</h2>
-  <h3 style="color: red;">DO NOT EDIT YOUR SOLUTION BASED ON OTHERS</h3>
+  <h2 style="color: red;">
+    Please wrap code in the following block as to avoid spoilers for others
+  </h2>
 
   <pre>
 &lt;details&gt;
@@ -34,9 +35,10 @@
 &lt;/details&gt;  
 </pre>
   <h3 style="color: red;">
-    CHEATING WILL ONLY BITE YOU BACK IN THE END AS THINGS GET MORE DIFFICULT
+    What I cannot create, I do not understand - Feynman
+    I hear and I forget. I see and I remember. I do and I understand. - Confucius - Confucius
   </h3>
-  <!--  <div class="giscus">
+  <!-- <div class="giscus">
     <div class="giscus-frame" />
   </div> -->
   <script
@@ -54,9 +56,9 @@
   </script>
   <!-- <Giscus
     repo="jestarray/howtocode"
-    repoId="MDEwOlJlcG9zaXRvcnk0MDM3MTI1NTA"
-    category="Assignment Submissions"
-    categoryId="DIC_kwDOGBAqJs4B_l8z"
+    repoId="MDEwOlJlcG9zaXRvcnk0MDM3MTI1NTA="
+    category={catagories.name}
+    categoryId={catagories.id}
     mapping="og:title"
     reactionsEnabled="1"
     emitMetadata="0"

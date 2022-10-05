@@ -235,24 +235,22 @@ function pick_random_el(arr: any[]) {
 // files and their names stored at : https://github.com/jestarray/howtocode/starter
 function exercise_from_filenames() {
   // TODO: make this an object with youtube links
+  // NOTE: DO NOT INCLUDE _STARTER.RKT OR _SOLUTION.RKT
   let filenames = [
-    "4-string-first_starter.rkt",
-    "4.1-string-last_starter.rkt",
-    "4.2-string-rest_starter.rkt",
-    "4.3-string-remove-last_starter.rkt",
-    "4.4-formalize_starter.rkt",
-    "5-image-area_starter.rkt",
-    "5.1-red-x_starter.rkt",
-    "5.2-cancel_starter.rkt",
-    "6-ensure-question_starter.rkt",
-    "6.1-punctuate_starter.rkt",
+"4.0-less-than-5",
+"5.0-string-first",
+"5.1-string-last",
+"5.2-string-rest",
+"5.3-string-remove-last",
+"5.4-formalize",
   ];
   return filenames.map((item) => {
     let dash_index = item.indexOf("-");
     let problem_number = parseFloat(item.slice(0, dash_index));
     let problem_name = item.slice(dash_index + 1).replace("_starter.rkt", "");
     return new ProblemSet(problem_name, problem_number, undefined, [new Problem("submission", 
-    `<h1>⬇️<a href="https://howtocode.pages.dev/starter/${item}" download>Download the starter file</a></h1>`, "")], 
+    `<h1>⬇️<a href="https://howtocode.pages.dev/starter/${item}_starter.rkt" download>Download the starter file</a></h1>
+     <h1>✅<a href="https://howtocode.pages.dev/starter/${item}_solution.rkt" download>Download the solution file</a></h1>`, "")], 
     [{url_title: "Solution", url: `https://howtocode.pages.dev/solutions/${item.replace("_starter.rkt", "_solution.rkt")}`, additional: ""}])
   });
 }
