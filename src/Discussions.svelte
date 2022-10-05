@@ -36,7 +36,10 @@
 </pre>
   <h3 style="color: red;">
     What I cannot create, I do not understand - Feynman
-    I hear and I forget. I see and I remember. I do and I understand. - Confucius - Confucius
+  </h3>
+  <h3 style="color: red;">
+    I hear and I forget. I see and I remember. I do and I understand. -
+    Confucius - Confucius
   </h3>
   <!-- <div class="giscus">
     <div class="giscus-frame" />
