@@ -236,22 +236,19 @@ function pick_random_el(arr: any[]) {
 function exercise_from_filenames() {
   // TODO: make this an object with youtube links
   // NOTE: DO NOT INCLUDE _STARTER.RKT OR _SOLUTION.RKT
-  let filenames = [
-"4.0-less-than-5",
-"5.0-string-first",
-"5.1-string-last",
-"5.2-string-rest",
-"5.3-string-remove-last",
-"5.4-formalize",
-  ];
-  return filenames.map((item) => {
-    let dash_index = item.indexOf("-");
-    let problem_number = parseFloat(item.slice(0, dash_index));
-    let problem_name = item.slice(dash_index + 1).replace("_starter.rkt", "");
+  let files = [{"hints":["<","string-length"],"name":"4.0-less-than-5"},{"hints":["substring"],"name":"5.0-string-first"},{"hints":["string-append","substring"],"name":"5.1-pig-latin"},{"hints":["substring","sub1","string-length"],"name":"5.1-string-last"},{"hints":["substring","string-length"],"name":"5.2-string-rest"},{"hints":["if","zero?","string-length","substring","sub1"],"name":"5.3-string-remove-last"},{"hints":["substring","string-length","string-append","string-upcase"],"name":"5.4-formalize"},{"hints":["and",">=","<="],"name":"5.5-teenager"},{"hints":["or",">="],"name":"5.6-can-ride"},{"hints":["substring","and","=","string-length","not","string=?","or"],"name":"5.7-sf-local"},{"hints":["if",">","string-length","string-append","substring"],"name":"5.8-TLDR"}];
+
+  return files.map((item) => {
+    let name = item.name;
+    let dash_index = name.indexOf("-");
+    let problem_number = parseFloat(name.slice(0, dash_index));
+    let problem_name = name.slice(dash_index + 1).replace("_starter.rkt", "");
+    let solution_url = `https://howtocode.pages.dev/solutions/${name}_solution.rkt`;
     return new ProblemSet(problem_name, problem_number, undefined, [new Problem("submission", 
-    `<h1>⬇️<a href="https://howtocode.pages.dev/starter/${item}_starter.rkt" download>Download the starter file</a></h1>
-     <h1>✅<a href="https://howtocode.pages.dev/starter/${item}_solution.rkt" download>Download the solution file</a></h1>`, "")], 
-    [{url_title: "Solution", url: `https://howtocode.pages.dev/solutions/${item.replace("_starter.rkt", "_solution.rkt")}`, additional: ""}])
+    `<h1>⬇️<a href="https://howtocode.pages.dev/starter/${name}_starter.rkt" download>Download the starter file</a></h1>
+     <details><summary>HINTS</summary><code>${item.hints.reduce((prev, curr) => prev + " " + curr)}</code></details>
+     <h1>✅<a href=${solution_url} download>Download the solution file</a></h1>`, "")], 
+    [{url_title: "Solution", url: `${solution_url}`, additional: ""}])
   });
 }
 

@@ -39,7 +39,7 @@
   </h3>
   <h3 style="color: red;">
     I hear and I forget. I see and I remember. I do and I understand. -
-    Confucius - Confucius
+    Confucius
   </h3>
   <!-- <div class="giscus">
     <div class="giscus-frame" />
