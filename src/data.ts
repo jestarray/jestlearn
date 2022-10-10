@@ -236,7 +236,7 @@ function pick_random_el(arr: any[]) {
 function exercise_from_filenames() {
   // TODO: make this an object with youtube links
   // NOTE: DO NOT INCLUDE _STARTER.RKT OR _SOLUTION.RKT
-  let files = [{"hints":["<","string-length"],"name":"4.0-less-than-5"},{"hints":["substring"],"name":"5.0-string-first"},{"hints":["string-append","substring"],"name":"5.1-pig-latin"},{"hints":["substring","sub1","string-length"],"name":"5.1-string-last"},{"hints":["substring","string-length"],"name":"5.2-string-rest"},{"hints":["if","zero?","string-length","substring","sub1"],"name":"5.3-string-remove-last"},{"hints":["substring","string-length","string-append","string-upcase"],"name":"5.4-formalize"},{"hints":["and",">=","<="],"name":"5.5-teenager"},{"hints":["or",">="],"name":"5.6-can-ride"},{"hints":["substring","and","=","string-length","not","string=?","or"],"name":"5.7-sf-local"},{"hints":["if",">","string-length","string-append","substring"],"name":"5.8-TLDR"}];
+  let files = [{"hints":["substring"],"name":"3.00-string-first"},{"hints":["substring","sub1","string-length"],"name":"3.01-string-last"},{"hints":["string-append","substring"],"name":"3.01-pig-latin"},{"hints":["<","string-length"],"name":"3.01-less-than-5"},{"hints":["substring","string-length"],"name":"3.02-string-rest"},{"hints":["if","zero?","string-length","substring","sub1"],"name":"3.03-string-remove-last"},{"hints":["substring","string-length","string-append","string-upcase"],"name":"3.04-formalize"},{"hints":["and",">=","<="],"name":"3.05-teenager"},{"hints":["or",">="],"name":"3.06-can-ride"},{"hints":["substring","and","=","string-length","not","string=?","or"],"name":"3.07-sf-local"},{"hints":["if",">","string-length","string-append","substring"],"name":"3.08-TLDR"},{"hints":["*","image-width","image-height",">"],"name":"3.50-image-larger"},{"hints":["sqrt","+","sqr","-"],"name":"3.51-distance"}];
 
   return files.map((item) => {
     let name = item.name;
@@ -244,9 +244,13 @@ function exercise_from_filenames() {
     let problem_number = parseFloat(name.slice(0, dash_index));
     let problem_name = name.slice(dash_index + 1).replace("_starter.rkt", "");
     let solution_url = `https://howtocode.pages.dev/solutions/${name}_solution.rkt`;
+    let hint_str = "";
+    if (item.hints.length != 0) {
+      hint_str = item.hints.reduce((prev, curr) => prev + " " + curr);
+    }
     return new ProblemSet(problem_name, problem_number, undefined, [new Problem("submission", 
     `<h1>⬇️<a href="https://howtocode.pages.dev/starter/${name}_starter.rkt" download>Download the starter file</a></h1>
-     <details><summary>HINTS</summary><code>${item.hints.reduce((prev, curr) => prev + " " + curr)}</code></details>
+     <details><summary>HINTS</summary><code>${hint_str}</code></details>
      <h1>✅<a href=${solution_url} download>Download the solution file</a></h1>`, "")], 
     [{url_title: "Solution", url: `${solution_url}`, additional: ""}])
   });
