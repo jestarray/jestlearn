@@ -258,7 +258,11 @@ function exercise_from_filenames() {
     `<h1>⬇️<a href="https://howtocode.pages.dev/starter/${name}_starter.rkt" download>Download the starter file</a></h1>
      <details><summary>HINTS</summary><code>${hint_str}</code></details>
      <h1>✅<a href=${solution_url} download>Download the solution file</a></h1>`, "")], 
-    [{url_title: "Solution", url: `${solution_url}`, additional: ""}])
+    [{url_title: "Solution", url: `${solution_url}`, additional: ""}],
+    [],
+    "❓",
+    //older entries in the json predate the section key
+    item.section ?? "none")
   });
 }
 

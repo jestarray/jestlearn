@@ -129,6 +129,7 @@
     <thead>
       <tr>
         <th scope="col">#</th>
+        <th scope="col">Section</th>
         <th scope="col">Title</th>
         <th scope="col">Progress</th>
         <th scope="col">Resources</th>
@@ -140,6 +141,7 @@
       {#each filtered as item}
         <tr>
           <td>{item.id}</td>
+          <td>{item.section}</td>
           <td><a href={"#" + convert_to_hash(item.title)}>{item.title}</a></td>
           <td>{calculate_progress(item.problems)} </td>
           <td>

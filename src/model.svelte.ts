@@ -62,6 +62,9 @@ export class ProblemSet {
   title = $state("");
   ///id is for section identification
   id = $state(0);
+  ///the named section this problem set belongs to, e.g "basics". defaulted so
+  ///that problem sets which have not been given a section still render.
+  section = $state("none");
   problem_index = $state(0);
   tags = $state<string[]>([]);
   // if you are not randomly generating problems, stick them in .problems
@@ -80,9 +83,12 @@ export class ProblemSet {
     resources: Resource[] = [],
     tags: string[] = [],
     emoji_mark: string = "❓",
+    //appended last so that the existing positional call sites stay valid
+    section: string = "none",
   ) {
     this.title = title;
     this.id = id;
+    this.section = section;
     this.problem_index = 0;
     this.problems = problems;
     this.tags = tags;
@@ -96,6 +102,7 @@ export class ProblemSet {
     return {
       title: this.title,
       id: this.id,
+      section: this.section,
       problem_index: this.problem_index,
       tags: this.tags,
       problems: this.problems,
@@ -120,6 +127,7 @@ export function clone_problem_set(ps: ProblemSet): ProblemSet {
     JSON.parse(JSON.stringify(ps.resources)),
     [...ps.tags],
     ps.emoji_mark,
+    ps.section,
   );
   copy.problem_index = ps.problem_index;
   copy.last_updated = ps.last_updated;
@@ -146,6 +154,9 @@ export function merge_back_deleted_props(
       val.gen = found.gen;
       val.resources = found.resources;
       val.tags = found.tags;
+      //saves written before sections existed have no section, and the server
+      //does not persist one, so take it from the current TOC
+      val.section = found.section;
       return val;
     } else {
       return val;
