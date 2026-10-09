@@ -19,5 +19,18 @@ export default defineConfig({
     outDir: "dist",
     emptyOutDir: true,
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        // Vite's default content hashes (index-DZGXvjqi.js) change on every
+        // build, but the built dist/ is committed and deployed by git, so a
+        // hashed name means index.html points at a file that is not in the
+        // repo until someone remembers to re-commit it. That is what broke
+        // /how_to_code/ in production (blank page, 404 on the entry script).
+        // Stable names keep index.html valid across rebuilds.
+        entryFileNames: "assets/[name].js",
+        chunkFileNames: "assets/[name].js",
+        assetFileNames: "assets/[name][extname]",
+      },
+    },
   },
 });
