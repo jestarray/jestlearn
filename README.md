@@ -4,20 +4,37 @@
 Make multichoice/input problems with ease!
 
 ## Develop / build:
-Svelte 5 + TypeScript, built with [Vite](https://vite.dev) (what Svelte recommends;
-no Rollup config to maintain):
+Svelte 5 + TypeScript 7 (native), built with [Vite](https://vite.dev) (what Svelte
+recommends; no Rollup config to maintain):
 ```
 npm install
-npm run dev      # dev server with HMR
-npm run build    # production build -> ./dist
-npm run preview  # serve the production build locally
-npm run check    # svelte-check (types + template diagnostics)
+npm run dev        # dev server with HMR
+npm run build      # production build -> ./dist
+npm run preview    # serve the production build locally
+npm run check      # svelte-check: TS 7 native diagnostics + Svelte templates
+npm run typecheck  # TS 7 native compiler only, .ts files (fast)
 ```
 `index.html` lives at the project root (Vite's entry HTML) and the static files
 that are copied as-is (`prism.js`, `global.css`, sounds, ...) live in `public/`.
 The build output in `dist/` is what gets deployed — the repo root's
 `update_jestlearn_htc.sh` copies it to `./howtocode`, and `server.js` serves
 `jestlearn/dist` for the "Example Course".
+
+### Why there are two TypeScript packages
+TypeScript 7 is the Go/native compiler. It no longer ships the JavaScript compiler
+API, and `svelte-check` (plus the VS Code Svelte extension, which uses the same
+machinery to turn `.svelte` files into TypeScript) needs that API, so both are
+installed:
+
+| package | version | used for |
+| --- | --- | --- |
+| `typescript` | `~6.0.3` | the JS API: `svelte-check`'s transform pipeline and editor tooling. `svelte-check` refuses to start if this one is v7 |
+| `@typescript/native` (alias of `typescript`) | `^7.0.2` | the actual type checker: `npm run check` passes `--tsgo`, and `npm run typecheck` runs it directly |
+
+`--tsgo` writes transpiled Svelte files to `.svelte-check/` (gitignored) and has
+the same limitations as `--incremental`. `npm run check:ts6` runs the old
+JS-based pipeline if you ever need to compare, and `npx tsc` resolves to the
+native 7 compiler (use `npm run typecheck` for a guaranteed TS 7 invocation).
 
 ## How to use:
 `data.ts` is the active file read by the rest of the program, so just copy and paste your course data into it and generate the `dist` folder and distribute that! (note: typescript/something will try to auto-fix imports! make sure every component is only reading `./data` and not `./data_computer_systems`, etc)

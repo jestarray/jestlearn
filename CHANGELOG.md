@@ -1,4 +1,11 @@
 # Unreleased
+- TypeScript upgraded to 7 (native compiler): installed as `@typescript/native`
+  (npm alias of `typescript@7`) and used for diagnostics via
+  `svelte-check --tsgo` / `npm run typecheck`. `typescript` itself is pinned to
+  `~6.0.3` because svelte-check (and the editor's Svelte tooling) still needs the
+  JavaScript compiler API, which TS 7 no longer ships; both are required by
+  svelte-check for TS 7 support. No source changes were needed — TS 7 reports the
+  same diagnostics as TS 6 on this codebase
 - Migrated from Svelte 3 to Svelte 5 (latest), with all components rewritten in runes
   mode (`$state`/`$derived`/`$effect`/`$props`), callback props instead of
   `createEventDispatcher`, `onclick`-style event attributes, dynamic components
