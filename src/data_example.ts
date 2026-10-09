@@ -1,4 +1,4 @@
-import { ProblemSet, Problem } from "./ProblemSet";
+import { ProblemSet, Problem, clone_problem_set } from "./ProblemSet";
 
 let e_choice = new Problem(
   "select",
@@ -77,7 +77,7 @@ let example_multi_choice = new ProblemSet(
 );
 
 // min and max are inclusive
-function ran_int(min, max) {
+function ran_int(min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -91,7 +91,7 @@ let example_generate = new ProblemSet(
   "Example Input RanGen: Binary To Decimal",
   2.0,
   function generate_binary_to_decimal(amount = 5) {
-    function normalize_bwidth(num, width) {
+    function normalize_bwidth(num: number, width: number) {
       // zero shift right converts the number to a signed 32 bit number?
       let binary = (num >>> 0).toString(2);
       if (binary.length < width) {
@@ -108,7 +108,7 @@ let example_generate = new ProblemSet(
         return binary;
       }
     }
-    function subscript(string, base) {
+    function subscript(string: string, base: string | number) {
       return `${string}<sub>${base}</sub>`;
     }
     let num = ran_int(0, 255);
@@ -169,18 +169,11 @@ let all: ProblemSet[] = [
   example_rest_api,
 ];
 //WARNING: do not stringify this! we need the gen function and a copy of the original questions for resetting and other things
-export const TOC_original: ProblemSet[] = all.map((val) => Object.freeze(val));
+export const TOC_original: ProblemSet[] = all;
 
-// we are mutating this
-//copy over the gen() functions that got removed because of stringify
-export let TOC: ProblemSet[] = JSON.parse(JSON.stringify(all)).map(
-  (val, index) => {
-    let m1 = Object.assign(val, TOC_original[index]);
-    //so we can run has_started() since it deleted the prototype link to the clas :/
-    m1.__proto__ = ProblemSet.prototype;
-    return m1;
-  }
-);
+// we are mutating this, so it is a deep clone of the data above.
+// clone_problem_set() keeps the gen() function that stringify would have removed.
+export let TOC: ProblemSet[] = all.map(clone_problem_set);
 //window.toc = TOC;
 //the home page of your course will be at https://yourdomain.com/example_course , where example_course is the name of the course(all spaces are replaced by underscores) 
 export const COURSE_NAME = "example course";

@@ -51,7 +51,7 @@ export function diff_latest(set_a: ProblemSet[], set_b: ProblemSet[]) {
 
 const website_sync_point = "https://jestlearn.com/sync";
 //const website_sync_point = "http://localhost:3000/sync";
-export async function send_sync(username, TOC, server_copy = [], code = 0):Promise<any> {
+export async function send_sync(username: string, TOC: ProblemSet[], server_copy: ProblemSet[] = [], code: number = 0): Promise<any> {
   let dlatest = diff_latest(TOC, server_copy);
   let send = {
     code: code,
@@ -76,11 +76,11 @@ export async function send_sync(username, TOC, server_copy = [], code = 0):Promi
         let clone = JSON.parse(JSON.stringify(pset));
         delete clone.resources;
         delete clone.tags;
-        clone.problems = clone.problems.map((problem) => {
+        clone.problems = clone.problems.map((problem: any) => {
           // keep input_answer_hints and explanations because they might be procedurally generated explanations
           //delete problem.input_answer_hint;
           if (Array.isArray(problem.answer)) {
-            problem.answer = problem.answer.map((answ) => {
+            problem.answer = problem.answer.map((answ: any) => {
               //delete answ.explanation;
               return answ;
             });

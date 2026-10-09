@@ -1,16 +1,20 @@
 <script lang="ts">
   import InputProblem from "./InputProblem.svelte";
   import SelectProblem from "./SelectProblem.svelte";
-  import { correct_answer_sound, wrong_answer_sound } from "./audio";
-  import { createEventDispatcher } from "svelte";
-  import { Problem, ProblemSet } from "./ProblemSet";
-  import { TOC, TOC_original } from "./data";
-  import Prism from "../public/prism";
-  import { Sync } from "./utils";
   import SubmissionProblem from "./SubmissionProblem.svelte";
+  import { correct_answer_sound, wrong_answer_sound } from "./audio";
+  import type { ProblemSet as ProblemSetData } from "./ProblemSet";
+  import { TOC_original } from "./data";
+  import { Sync } from "./utils";
 
-  export let data: ProblemSet;
-  const dispatch = createEventDispatcher();
+  let {
+    data,
+    onSave,
+  }: {
+    data: ProblemSetData;
+    onSave?: (event: { code: Sync }) => void;
+  } = $props();
+
   function check_already_answered_beforehand() {
     if (data.problems.length > 0) {
       return (
@@ -21,21 +25,26 @@
       return false;
     }
   }
-  let check_answer;
-  let is_valid = false || check_already_answered_beforehand();
-  let enable_next_button = false || check_already_answered_beforehand();
-  /*  let problem_index =
-    progress.indexOf(Result.UNANSWERED) !== -1
-      ? progress.indexOf(Result.UNANSWERED)
-      : 0; */
-  $: finished_all_problems = false;
-  $: current_problem = data.problems[data.problem_index];
-  $: reset_input_answer = false;
-  let reset_problems = false;
-  let show_answer_option = false;
+
+  let check_answer = $state<(() => boolean) | null>(null);
+  let is_valid = $state(check_already_answered_beforehand());
+  let enable_next_button = $state(check_already_answered_beforehand());
+  let finished_all_problems = $state(false);
+  let current_problem = $derived(data.problems[data.problem_index]);
+  // bumped whenever the answer input should be emptied (i.e. on every next/reset)
+  let reset_input = $state(0);
+  let reset_problems = $state(false);
+  let show_answer_option = $state(false);
+
+  // the child problems hand their checker + input validity up to us
+  function set_check_answer(fn: () => boolean) {
+    check_answer = fn;
+  }
+  function set_valid(valid: boolean) {
+    is_valid = valid;
+  }
 
   function check() {
-    reset_input_answer = false;
     data.problems[data.problem_index].tries += 1;
     if (check_answer && check_answer()) {
       if (check_already_answered_beforehand()) {
@@ -63,8 +72,9 @@
       data.problems[data.problem_index].result = "❌";
     }
     data.last_updated = Date.now();
-    dispatch("save", { code: Sync.UPDATE });
+    onSave?.({ code: Sync.UPDATE });
   }
+
   async function reset() {
     if (data.problem_index < data.problems.length - 1) {
       data.problem_index += 1;
@@ -73,33 +83,27 @@
       is_valid = false;
     } else {
       finished_all_problems = true;
-      if (finished_all_problems) {
-        if (reset_problems) {
-          reset_problems = false;
-          data.problem_index = 0;
-          enable_next_button = false;
-          check_answer = null;
-          is_valid = false;
-          finished_all_problems = false;
-          if (data.gen) {
-            let generated = await data.gen();
-            data.problems = generated;
-            data.problems = data.problems;
-          } else {
-            //if the TOC data updates and the user resets the problem, they will get the latest TOC version rather than having an old version of a non-updated TOC
-            let cloned = JSON.parse(JSON.stringify(TOC_original)).find(
-              (val) => {
-                return val.title === data.title;
-              }
-            ).problems;
-            //do not change data.problems = , assignment because it wont work if you do data.problems = .
-            //https://svelte.dev/tutorial/updating-arrays-and-objects
-            data.problems = cloned;
-            data.problems = data.problems;
-          }
+      if (reset_problems) {
+        reset_problems = false;
+        data.problem_index = 0;
+        enable_next_button = false;
+        check_answer = null;
+        is_valid = false;
+        finished_all_problems = false;
+        if (data.gen) {
+          let generated = await data.gen();
+          data.problems = generated;
         } else {
-          reset_problems = true;
+          //if the TOC data updates and the user resets the problem, they will get the latest TOC version rather than having an old version of a non-updated TOC
+          let cloned = JSON.parse(JSON.stringify(TOC_original)).find(
+            (val: ProblemSetData) => {
+              return val.title === data.title;
+            },
+          ).problems;
+          data.problems = cloned;
         }
+      } else {
+        reset_problems = true;
       }
     }
     data.last_updated = Date.now();
@@ -107,8 +111,9 @@
     if (finished_all_problems) {
       code = Sync.ARCHIVE;
     }
-    dispatch("save", { code: code });
-    reset_input_answer = true;
+    onSave?.({ code: code });
+    //the answer box of the problem we just moved onto has to be emptied
+    reset_input += 1;
   }
   /* TODO:
   CONSIDER REMOVING INPUTPROBLEM AND SELECT PROBLEM NEEDING TO COMMUNICATE BACK UP HERE!
@@ -117,7 +122,7 @@
 
 <title>{data.title}</title>
 <div>
-  {#each data.problems as item, index}
+  {#each data.problems as item}
     <span style="margin: 0.5rem;">
       {item.result}
     </span>
@@ -126,51 +131,33 @@
     <h2>Loading...</h2>
   {:else if current_problem.type === "input"}
     <InputProblem
-      reset={reset_input_answer}
       data={current_problem}
+      {reset_input}
       {show_answer_option}
-      on:update-check={(event) => {
-        check_answer = event.detail;
-      }}
-      on:valid-input={(event) => {
-        is_valid = event.detail;
-      }}
-      on:check-answer={enable_next_button ? reset : check}
+      onUpdateCheck={set_check_answer}
+      onValidInput={set_valid}
+      onCheckAnswer={enable_next_button ? reset : check}
     />
   {:else if current_problem.type === "submission"}
-    <SubmissionProblem
-      title={data.title}
-      data={current_problem}
-      on:update-check={(event) => {
-        check_answer = event.detail;
-      }}
-      on:valid-input={(event) => {
-        is_valid = event.detail;
-      }}
-      on:check-answer={enable_next_button ? reset : check}
-    />
+    <SubmissionProblem title={data.title} data={current_problem} />
   {:else if current_problem.type === "select"}
     <SelectProblem
       data={current_problem}
       enable_next_button={enable_next_button || reset_problems}
-      on:update-check={(event) => {
-        check_answer = event.detail;
-      }}
-      on:valid-input={(event) => {
-        is_valid = event.detail;
-      }}
+      onUpdateCheck={set_check_answer}
+      onValidInput={set_valid}
     />
   {/if}
   <div class="text-align-center">
     {#if enable_next_button}
-      <button class="button" on:click={reset}
+      <button class="button" onclick={reset}
         >{finished_all_problems ? "Reset" : "Next"}</button
       >
       <!-- todo: actually submission problems could use a submit button if we want to store said submission in the database but for now i'm just explioting github discussions for these code assignment submissions -->
     {:else if current_problem != undefined && current_problem.type !== "submission"}
       <button
         class={is_valid ? "button" : "button disabled"}
-        on:click={check}
+        onclick={check}
         disabled={!is_valid}>Check</button
       >
     {/if}

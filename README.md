@@ -3,12 +3,35 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/4250a53b-cc48-482c-ae06-c07cbffd75f6/deploy-status)](https://app.netlify.com/sites/jestlearn/deploys)
 Make multichoice/input problems with ease!
 
+## Develop / build:
+Svelte 5 + TypeScript, built with [Vite](https://vite.dev) (what Svelte recommends;
+no Rollup config to maintain):
+```
+npm install
+npm run dev      # dev server with HMR
+npm run build    # production build -> ./dist
+npm run preview  # serve the production build locally
+npm run check    # svelte-check (types + template diagnostics)
+```
+`index.html` lives at the project root (Vite's entry HTML) and the static files
+that are copied as-is (`prism.js`, `global.css`, sounds, ...) live in `public/`.
+The build output in `dist/` is what gets deployed — the repo root's
+`update_jestlearn_htc.sh` copies it to `./howtocode`, and `server.js` serves
+`jestlearn/dist` for the "Example Course".
+
 ## How to use:
-`data.ts` is the active file read by the rest of the program, so just copy and paste your course data into it and generate the `public` folder and distribute that! (note: typescript/something will try to auto-fix imports! make sure every component is only reading `./data` and not `./data_computer_systems`, etc)
+`data.ts` is the active file read by the rest of the program, so just copy and paste your course data into it and generate the `dist` folder and distribute that! (note: typescript/something will try to auto-fix imports! make sure every component is only reading `./data` and not `./data_computer_systems`, etc)
 Edit `course_name` in `data.ts`, should be unique
 Edit `data.ts` with problem sets and such and that's mostly it
 If you want cloud syncing change the `website_sync_point` and self host the server. For now it's pointed at my server
 If you want to support more languages, just replace prism.js and prism.css
+
+## Data model:
+`Problem`/`ProblemSet`/`gen_amount` live in `src/model.svelte.ts` (a `.svelte.ts`
+module, so the classes can use runes and stay deeply reactive — Svelte 5 no longer
+makes class instances reactive implicitly). `src/ProblemSet.ts` re-exports them, so
+`import { ProblemSet, Problem } from "./ProblemSet"` keeps working in your course
+data files.
 
 ## Legend:
 ✅ - for correct answer

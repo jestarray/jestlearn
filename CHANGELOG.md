@@ -1,3 +1,25 @@
+# Unreleased
+- Migrated from Svelte 3 to Svelte 5 (latest), with all components rewritten in runes
+  mode (`$state`/`$derived`/`$effect`/`$props`), callback props instead of
+  `createEventDispatcher`, `onclick`-style event attributes, dynamic components
+  instead of `<svelte:component>`, and `mount()` instead of `new App()`
+- Replaced the Rollup build with Vite + `@sveltejs/vite-plugin-svelte` (Svelte's
+  recommended toolchain): `npm run dev` / `build` / `preview`; TypeScript 5 +
+  `svelte-check` 4; `index.html` moved to the project root and the build output is
+  now `dist/` (deploy scripts and `server.js` updated accordingly)
+- `Problem`/`ProblemSet` moved to `src/model.svelte.ts` so their fields can be
+  `$state` (Svelte 5 does not make class instances reactive on its own). They gained
+  `toJSON()` because rune class fields compile to private fields + accessors, which
+  `JSON.stringify` would otherwise skip. `src/ProblemSet.ts` re-exports them, so
+  course data files keep importing from `./ProblemSet`
+- The `TOC` copy is now built with `clone_problem_set()` rather than
+  `JSON.parse(JSON.stringify(...))` + `Object.assign` + `__proto__` patching, and the
+  `svelte/internal` import was dropped (that module no longer exists in Svelte 5)
+- Replaced `afterUpdate()` with `$effect()` and made the answer input actually clear
+  on every next/reset (the old boolean reset flag only fired on the first transition)
+- `public/prism.js` is now used only through its global (`window.Prism`), because Vite
+  cannot import JavaScript out of the `public/` folder
+
 # 0.6.1
 - Critical Fix bug where problems would not generate at all
 + Fixed semantic versioning

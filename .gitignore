@@ -1,4 +1,6 @@
 /node_modules/
+/dist/
+# stale Rollup/bundle output from before the Vite migration
 /public/build/
 
 .DS_Store

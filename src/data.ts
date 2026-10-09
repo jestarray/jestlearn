@@ -1,5 +1,4 @@
-import { object_without_properties } from "svelte/internal";
-import { ProblemSet, Problem, gen_amount } from "./ProblemSet";
+import { ProblemSet, Problem, gen_amount, clone_problem_set } from "./ProblemSet";
 import valid_assignments from "./VALID-ASSIGNMENTS.json";
 
 const LOCAL_DEV = false;
@@ -265,18 +264,11 @@ function exercise_from_filenames() {
 
 let all: ProblemSet[] = [racket_math_expressions, infix_to_prefix, racket_string_practice, ran_var_arith, build_a_string, comparisons, logical, func_scope_eval, func_scope_eval_2, structs_build, ...exercise_from_filenames()];
 //WARNING: do not stringify this! we need the gen function and a copy of the original questions for resetting and other things
-export const TOC_original: ProblemSet[] = all.map((val) => Object.freeze(val));
+export const TOC_original: ProblemSet[] = all;
 
-// we are mutating this
-//copy over the gen() functions that got removed because of stringify
-export let TOC: ProblemSet[] = JSON.parse(JSON.stringify(all)).map(
-  (val, index) => {
-    let m1 = Object.assign(val, TOC_original[index]);
-    //so we can run has_started() since it deleted the prototype link to the clas :/
-    m1.__proto__ = ProblemSet.prototype;
-    return m1;
-  }
-);
+// we are mutating this, so it is a deep clone of the data above.
+// clone_problem_set() keeps the gen() function that stringify would have removed.
+export let TOC: ProblemSet[] = all.map(clone_problem_set);
 //window.toc = TOC;
 //the home page of your course will be at https://yourdomain.com/example_course , where example_course is the name of the course(all spaces are replaced by underscores)
 export const COURSE_NAME = "how to code"

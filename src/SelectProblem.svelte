@@ -1,20 +1,33 @@
-<script type="ts">
-  export let data;
-  export let enable_next_button;
-  import { afterUpdate, createEventDispatcher, onMount } from "svelte";
-  const dispatch = createEventDispatcher();
-  $: selected = [];
-  $: dispatch("update-check", function check_answer() {
-    let correct_indexes: number[] = data.answer
+<script lang="ts">
+  import type { AnswerOption, Problem } from "./ProblemSet";
+
+  let {
+    data,
+    enable_next_button = false,
+    onUpdateCheck,
+    onValidInput,
+  }: {
+    data: Problem;
+    enable_next_button?: boolean;
+    onUpdateCheck?: (check_answer: () => boolean) => void;
+    onValidInput?: (is_valid: boolean) => void;
+  } = $props();
+
+  let selected = $state<number[]>([]);
+  const answers = $derived(
+    (Array.isArray(data.answer) ? data.answer : []) as AnswerOption[],
+  );
+
+  function check_answer() {
+    let correct_indexes: number[] = answers
       .map((item, index) => {
         if (item.correct) {
           return index;
         }
+        return -1;
       })
-      .filter((item) => {
-        if (item !== undefined) {
-          return true;
-        }
+      .filter((index) => {
+        return index !== -1;
       });
     //did not pick all the answers, therefore got it wrong
     if (correct_indexes.length !== selected.length) {
@@ -31,15 +44,25 @@
       selected = [];
       return true;
     }
+  }
+
+  // hand the checker and the validity of the current selection up to ProblemSet
+  $effect(() => {
+    onUpdateCheck?.(check_answer);
+    onValidInput?.(selected.length > 0);
   });
+
   //refresh syntax highlighting!
   // TODO: warning! it refreshes on every update! maybe we should just use prism to static pre- generate/rendering and shove that into the problem html and not have to worry about dynamic syntax highlighting. Probably not a big deal though if highlightAll() is nothing perf wise
   // https://prismjs.com/#basic-usage-node
-  afterUpdate(() => {
+  $effect(() => {
+    void data;
+    void enable_next_button;
+    void selected.length;
     Prism.highlightAll();
   });
-  $: dispatch("valid-input", selected.length > 0);
-  function color_answers(is_correct) {
+
+  function color_answers(is_correct: boolean) {
     if (enable_next_button) {
       if (is_correct) {
         return "correct";
@@ -56,20 +79,18 @@
   <div>
     {@html data.question}
   </div>
-  {#each data.answer as option, index}
+  {#each answers as option, index}
     <label class={color_answers(option.correct)}>
-      <!-- selected_radio_index = index -->
       <input
         type="checkbox"
         bind:group={selected}
         value={index}
-        on:click={function () {}}
         disabled={enable_next_button}
       />
       {@html option.text}
       {#if enable_next_button}
         <br />
-        {@html option.explanation}
+        {@html option.explanation ?? ""}
       {/if}
     </label>
   {/each}

@@ -1,15 +1,18 @@
 <script lang="ts">
-  import { Giscus } from "@giscus/svelte";
-  export let title;
-  export let submission; //bool to switch submissions to the help thread instead
-  let catagories = { name: "Help", id: "DIC_kwDOGBAqJs4B_o5o" };
-  if (submission) {
-    catagories = { name: "Assignment Submissions", id: "DIC_kwDOGBAqJs4B_l8z" };
-  }
+  // @giscus/svelte v3 exports the component as the default export
+  import Giscus from "@giscus/svelte";
 
-  import { createEventDispatcher, afterUpdate } from "svelte";
+  let { title, submission = false }: { title: string; submission?: boolean } =
+    $props();
+  const catagories = $derived(
+    submission
+      ? { name: "Assignment Submissions", id: "DIC_kwDOGBAqJs4B_l8z" }
+      : { name: "Help", id: "DIC_kwDOGBAqJs4B_o5o" },
+  );
+
   // todo: use server side rendering for highlighting the below codeblock?
-  afterUpdate(() => {
+  $effect(() => {
+    void title;
     Prism.highlightAll();
   });
 </script>

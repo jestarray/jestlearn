@@ -1,13 +1,13 @@
 <script lang="ts">
+  import type { Component } from "svelte";
   import ProblemSet from "./ProblemSet.svelte";
   import {
     merge_back_deleted_props,
-    ProblemSet as ProblemSetData,
+    type ProblemSet as ProblemSetData,
   } from "./ProblemSet";
   import Home from "./routes/Home.svelte";
-  import { Sync } from "./utils";
   import router from "page";
-  import { convert_to_hash, diff_latest, send_sync } from "./utils";
+  import { convert_to_hash, diff_latest, send_sync, Sync } from "./utils";
   import { TOC, TOC_original, COURSE_NAME } from "./data";
   import Discussions from "./Discussions.svelte";
 
@@ -22,14 +22,23 @@
     });
     return result;
   }
-  let page;
-  let discussion_title = "";
-  let section: ProblemSetData | undefined;
-  let merged: ProblemSetData[] = TOC;
-  async function route_pages(ctx, next) {
+
+  // which page component the router currently wants us to render
+  let Page = $state<Component<any>>(Home);
+  let discussion_title = $state("");
+  let section = $state<ProblemSetData | undefined>(undefined);
+  let merged = $state<ProblemSetData[]>(TOC);
+  //for when you have a single domain but multiple courses on that domain/server where the vps distributes all the course static files(see server.js), e.g jestlearn.com/computers404 , jestlearn.com/how_to_code , we will attempt to use this instead for the base path. The route below "/" will never run if this is the case
+  const initial_course_base_path = `/${convert_to_hash(COURSE_NAME)}/`;
+  let course_base_path = $state(initial_course_base_path);
+  let server_save_cache = $state(
+    JSON.parse(localStorage.getItem("save_server") ?? "null"),
+  );
+
+  async function route_pages(ctx: { hash: string }) {
     let hash: string = ctx.hash;
     if (hash.includes("discuss")) {
-      page = Discussions;
+      Page = Discussions;
       let slash_index = hash.indexOf("/") + 1;
       let path = hash.slice(slash_index, hash.length);
       let title = convert_to_title(path);
@@ -38,113 +47,110 @@
       //user is on a problem page or the home page
       // the gen() function was probably not serialized
       let saved: ProblemSetData[] | null = JSON.parse(
-        localStorage.getItem("save")
+        localStorage.getItem("save") ?? "null",
       );
       if (saved) {
         merged = merge_back_deleted_props(diff_latest(TOC, saved), TOC);
-        merged = merged;
       }
       section = merged.find((item) => {
         return convert_to_hash(item.title) === hash;
       });
       if (section !== undefined) {
-        page = ProblemSet;
+        Page = ProblemSet;
         if (section.problems.length > 0) {
-          // restore from save file
-          section.problems = section.problems;
+          // restore from save file, the problems are already there
         } else if (section.gen !== undefined) {
           //if the problem set is randomly generated, generate some problems
-          let generated = await section.gen();
-          section.problems = generated;
-          //re-assign for svelte reactivity or else the UI wont update
-          section.problems = section.problems;
+          section.problems = await section.gen();
         } else {
           console.warn("should not have gotten here! ");
-          section.problems = section.problems;
         }
       } else {
-        page = Home;
+        Page = Home;
       }
     }
   }
-  //for when you have a single domain but multiple courses on that domain/server where the vps distributes all the course static files(see server.js), e.g jestlearn.com/computers404 , jestlearn.com/how_to_code , we will attempt to use this instead for the base path. The route below "/" will never run if this is the case
-  let course_base_path = `/${convert_to_hash(COURSE_NAME)}/`;
 
-  router(`${course_base_path}`, (ctx, next) => {
-    route_pages(ctx, next);
+  router(initial_course_base_path, (ctx) => {
+    route_pages(ctx);
   });
   //if your course is on  a single domain e.g learnhowtocode.com/ hosted on github pages or something, then we will set the base path to /
 
-  router(`/`, (ctx, next) => {
-    route_pages(ctx, next);
+  router(`/`, (ctx) => {
+    route_pages(ctx);
     course_base_path = "/";
   });
   router("/discuss", () => {
-    page = Discussions;
+    Page = Discussions;
   });
 
   router.start();
+
   function filter_non_worked_on(arr: ProblemSetData[]) {
     return arr.filter((val) => val.last_updated > 0);
   }
-  let server_save_cache = JSON.parse(localStorage.getItem("save_server"));
+
+  function handle_save(server_data: any) {
+    if (server_data !== null && server_data.problems !== undefined) {
+      localStorage.setItem("save_server", JSON.stringify(server_data));
+    }
+    server_save_cache = JSON.parse(
+      localStorage.getItem("save_server") ?? "null",
+    );
+    if (server_save_cache !== null) {
+      merged = diff_latest(merged, server_save_cache.problems);
+      if (server_data.code == Sync.ARCHIVE) {
+        console.log("archiving");
+      }
+      //not elseif!
+      if (server_data.code !== Sync.INITIAL) {
+        send_sync(
+          server_save_cache.username,
+          merged,
+          server_save_cache.problems,
+          server_data.code,
+        )
+          .then((rr) => {})
+          .catch((err) => {
+            console.warn(err);
+          });
+      }
+    }
+    //merge back the toc tags and stuff
+    merged = merge_back_deleted_props(
+      diff_latest(merged, TOC_original),
+      TOC_original,
+    );
+    //todo: dont save the ones that are last_updated 0?
+    localStorage.setItem(
+      "save",
+      JSON.stringify(filter_non_worked_on(merged)),
+    );
+    //todo: diff with server copy and then upload to server
+    //server should only store old finished attempts for analytics, e.g when the reset button is hit, so need to distuginish
+    console.log("LOG: SAVING");
+  }
 </script>
 
-{#if page !== Home}
+{#if Page !== Home}
   <nav class="home-alignment">
-    <a href={`${course_base_path}`}>🏠Home</a>
+    <a href={course_base_path}>🏠Home</a>
   </nav>
 {/if}
 
 <main class="flex-placement">
-  <svelte:component
-    this={page}
-    base_path={course_base_path}
-    title={discussion_title}
-    data={section}
-    {merged}
-    {server_save_cache}
-    on:save={(diff_with) => {
-      let server_data = diff_with.detail;
-      if (server_data !== null && server_data.problems !== undefined) {
-        localStorage.setItem("save_server", JSON.stringify(server_data));
-      }
-      server_save_cache = JSON.parse(localStorage.getItem("save_server"));
-      if (server_save_cache !== null) {
-        merged = diff_latest(merged, server_save_cache.problems);
-        if (server_data.code == Sync.ARCHIVE) {
-          console.log("archiving");
-        }
-        //not elseif!
-        if (server_data.code !== Sync.INITIAL) {
-          send_sync(
-            server_save_cache.username,
-            merged,
-            server_save_cache.problems,
-            server_data.code
-          )
-            .then((rr) => {})
-            .catch((err) => {
-              console.warn(err);
-            });
-        }
-      }
-      //merge back the toc tags and stuff
-      merged = merge_back_deleted_props(
-        diff_latest(merged, TOC_original),
-        TOC_original
-      );
-      merged = merged;
-      //todo: dont save the ones that are last_updated 0?
-      localStorage.setItem(
-        "save",
-        JSON.stringify(filter_non_worked_on(merged))
-      );
-      //todo: diff with server copy and then upload to server
-      //server should only store old finished attempts for analytics, e.g when the reset button is hit, so need to distuginish
-      console.log("LOG: SAVING");
-    }}
-  />
+  {#if Page === Home}
+    <Home
+      base_path={course_base_path}
+      {merged}
+      {server_save_cache}
+      onSave={handle_save}
+    />
+  {:else if Page === ProblemSet && section !== undefined}
+    <ProblemSet data={section} onSave={handle_save} />
+  {:else if Page === Discussions}
+    <Discussions title={discussion_title} />
+  {/if}
 </main>
 
 <style>

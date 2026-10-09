@@ -1,20 +1,36 @@
 <script lang="ts">
-  import type { ProblemSet as ProblemSetData } from "../ProblemSet";
+  import type { Problem, ProblemSet as ProblemSetData } from "../ProblemSet";
   import { convert_to_hash } from "../utils";
   import { TOC, COURSE_NAME } from "../data";
-  import { createEventDispatcher } from "svelte";
-  import { has_started } from "../ProblemSet";
   import { Sync, send_sync } from "../utils";
-  export let base_path;
-  export let merged: ProblemSetData[];
-  export let server_save_cache;
-  const dispatch = createEventDispatcher();
-  $: search_text = "";
-  $: filtered =
+
+  let {
+    base_path,
+    merged,
+    server_save_cache,
+    onSave,
+  }: {
+    base_path: string;
+    merged: ProblemSetData[];
+    server_save_cache: any;
+    onSave?: (data_from_server: any) => void;
+  } = $props();
+
+  let search_text = $state("");
+  let username = $state("");
+
+  // a returning user already has a username cached on this device
+  $effect(() => {
+    if (server_save_cache) {
+      username = server_save_cache.username;
+    }
+  });
+
+  let filtered = $derived(
     search_text.length > 0
       ? merged.filter((item) => {
           let lowercase_search = search_text.toLowerCase();
-          function find_one(arr, search): boolean {
+          function find_one(arr: string[], search: string): boolean {
             for (let item of arr) {
               if (item.includes(search)) {
                 return true;
@@ -27,8 +43,10 @@
             find_one(item.tags, lowercase_search.trim())
           );
         })
-      : merged;
-  function calculate_progress(progress) {
+      : merged,
+  );
+
+  function calculate_progress(progress: Problem[]) {
     let solved = 0;
     for (let item of progress) {
       if (item.result === "✅") {
@@ -38,16 +56,21 @@
     let res = `${solved}/${progress.length}`;
     return res;
   }
+
+  function close_resources_modal() {
+    var modal = document.getElementById("resources-modal");
+    if (modal) {
+      modal.style.display = "none";
+    }
+  }
+
   window.onclick = function (event) {
     var modal = document.getElementById("resources-modal");
-    if (event.target == modal) {
+    if (event.target == modal && modal) {
       modal.style.display = "none";
     }
   };
-  let username = "";
-  if (server_save_cache) {
-    username = server_save_cache.username;
-  }
+
   function delete_data() {
     localStorage.removeItem("save_server");
     localStorage.removeItem("save");
@@ -63,7 +86,7 @@
       Logged in as: <b>{server_save_cache.username}</b>
       <button
         class="logout-button"
-        on:click={() => {
+        onclick={() => {
           delete_data();
           location.reload();
         }}>Logout</button
@@ -75,14 +98,14 @@
         placeholder="Username"
         bind:value={username}
       /><button
-        on:click={function login() {
+        onclick={function login() {
           //validate username form
           if (username.length > 0) {
             //send the problems worked on to the server
             send_sync(username.toLowerCase().trim(), TOC, [], Sync.INITIAL)
               .then((data_from_server) => {
                 data_from_server.code = Sync.INITIAL;
-                dispatch("save", data_from_server);
+                onSave?.(data_from_server);
                 //force page refresh after save to update the homepage
                 //location.reload();
               })
@@ -97,77 +120,79 @@
 
   <div id="resources-modal" class="modal">
     <div class="modal-content" id="m-content">
-      <span
-        class="close"
-        on:click={() => {
-          var modal = document.getElementById("resources-modal");
-          modal.style.display = "none";
-        }}>&times;</span
-      >
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <span class="close" onclick={close_resources_modal}>&times;</span>
     </div>
   </div>
   <table>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Title</th>
-      <th scope="col">Progress</th>
-      <th scope="col">Resources</th>
-      <th scope="col">Discuss</th>
-      <th scope="col">Mark</th>
-    </tr>
-
-    {#each filtered as item}
+    <thead>
       <tr>
-        <td>{item.id}</td>
-        <td><a href={"#" + convert_to_hash(item.title)}>{item.title}</a></td>
-        <td>{calculate_progress(item.problems)} </td>
-        <td>
-          {#if item.resources}
-            <button
-              disabled={item.resources.length <= 0}
-              on:click={() => {
-                var modal = document.getElementById("resources-modal");
-                modal.style.display = "block";
-                var modal_content = document.getElementById("m-content");
-                if (item.resources.length > 0) {
-                  modal_content.innerHTML = item.resources
-                    .map((res) => {
-                      return `<p>
+        <th scope="col">#</th>
+        <th scope="col">Title</th>
+        <th scope="col">Progress</th>
+        <th scope="col">Resources</th>
+        <th scope="col">Discuss</th>
+        <th scope="col">Mark</th>
+      </tr>
+    </thead>
+    <tbody>
+      {#each filtered as item}
+        <tr>
+          <td>{item.id}</td>
+          <td><a href={"#" + convert_to_hash(item.title)}>{item.title}</a></td>
+          <td>{calculate_progress(item.problems)} </td>
+          <td>
+            {#if item.resources}
+              <button
+                disabled={item.resources.length <= 0}
+                onclick={() => {
+                  var modal = document.getElementById("resources-modal");
+                  var modal_content = document.getElementById("m-content");
+                  if (!modal || !modal_content) {
+                    return;
+                  }
+                  modal.style.display = "block";
+                  if (item.resources.length > 0) {
+                    modal_content.innerHTML = item.resources
+                      .map((res) => {
+                        return `<p>
                   <a href=${res.url} title=${res.url} target="_blank"
                     >${res.url_title}
                   </a>
                   ${res.additional}
                 </p>`;
-                    })
-                    .reduce((prev, curr) => prev + curr);
-                } else {
-                  modal_content.innerHTML = "";
-                }
-              }}>View</button
-            >
-          {/if}
-        </td>
-        <td
-          ><a href={`${base_path}#discuss/${convert_to_hash(item.title)}`}
-            >Github</a
-          ></td
-        >
-        <td
-          ><select
-            bind:value={item.emoji_mark}
-            on:change={() => {
-              item.last_updated = Date.now();
-              dispatch("save", { code: Sync.UPDATE });
-            }}
+                      })
+                      .reduce((prev, curr) => prev + curr);
+                  } else {
+                    modal_content.innerHTML = "";
+                  }
+                }}>View</button
+              >
+            {/if}
+          </td>
+          <td
+            ><a href={`${base_path}#discuss/${convert_to_hash(item.title)}`}
+              >Github</a
+            ></td
           >
-            <option value="❓">❓</option>
-            <option value="⚠️">⚠️</option>
-            <option value="✅">✅</option>
-            <option value="❌">❌</option>
-          </select></td
-        >
-      </tr>
-    {/each}
+          <td
+            ><select
+              bind:value={item.emoji_mark}
+              onchange={() => {
+                item.last_updated = Date.now();
+                onSave?.({ code: Sync.UPDATE });
+              }}
+            >
+              <option value="❓">❓</option>
+              <option value="⚠️">⚠️</option>
+              <option value="✅">✅</option>
+              <option value="❌">❌</option>
+            </select></td
+          >
+        </tr>
+      {/each}
+    </tbody>
   </table>
   <a href="https://github.com/jestarray/jestlearn">v0.6.1</a>
   |
@@ -179,7 +204,7 @@
   |
   <a
     href="#/"
-    on:click={() => {
+    onclick={() => {
       //todo: should send a req to the server deleting user data also?
       //mainly for malformed sync data
       delete_data();

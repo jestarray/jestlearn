@@ -1,7 +1,7 @@
-import { ProblemSet, Problem, gen_amount } from "./ProblemSet";
+import { ProblemSet, Problem, gen_amount, clone_problem_set } from "./ProblemSet";
 
 /// inclusive range
-export function ran_int(min, max) {
+export function ran_int(min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -9,7 +9,7 @@ export function ran_int(min, max) {
 
 //deci to binary
 //tdo! change name as it just normalizes a deci number to bianry given a bit width
-export function normalize_bwidth(num, width) {
+export function normalize_bwidth(num: number, width: number) {
   // zero shift right converts the number to a signed 32 bit number?
   let binary = (num >>> 0).toString(2);
   if (binary.length < width) {
@@ -29,7 +29,7 @@ export function normalize_bwidth(num, width) {
 
 // binary to twos complement decimal
 // 1010 -> -6
-export function twos_complement_deci(binary, width) {
+export function twos_complement_deci(binary: string, width: number) {
   let sign_weight = -Math.pow(2, width - 1);
   let posi = normalize_bwidth(parseInt(binary, 2), width - 1);
   return sign_weight + parseInt(posi, 2);
@@ -56,7 +56,7 @@ export function generate_twoscomp_to_deci() {
   );
 }
 
-export function subscript(string, base) {
+export function subscript(string: string | number, base: string | number) {
   return `${string}<sub>${base}</sub>`;
 }
 
@@ -170,7 +170,7 @@ export function generate_bitwise_vec_operations() {
         </pre>
         <h2>what is a ${random_operation} b ?</h2>
         `,
-    normalize_bwidth(answer, 8),
+    normalize_bwidth(answer ?? 0, 8),
     "Answer ex: 000100"
   );
 }
@@ -211,7 +211,7 @@ export function generate_bitwise_shift() {
   );
 }
 
-function binary_add(s1, s2) {
+function binary_add(s1: string, s2: string): string | undefined {
   if (s1.length === s2.length) {
     let carry = 0;
     let res = "";
@@ -427,7 +427,7 @@ export let all = [
         }
         b1 = normalize_bwidth(d1, bit_width);
         b2 = normalize_bwidth(d2, bit_width);
-        answer = parseInt(binary_add(b1, b2), 2);
+        answer = parseInt(binary_add(b1, b2) ?? "", 2);
       } else {
         //positive overflow
         d1 = ran_int(1, TMAX);
@@ -437,7 +437,7 @@ export let all = [
         }
         b1 = normalize_bwidth(d1, bit_width);
         b2 = normalize_bwidth(d2, bit_width);
-        let badd = binary_add(b1, b2);
+        let badd = binary_add(b1, b2) ?? "";
         answer = twos_complement_deci(badd, bit_width);
       }
       return new Problem(
@@ -458,18 +458,11 @@ export let all = [
 ];
 
 //WARNING: do not stringify this! we need the gen function and a copy of the original questions for resetting and other things
-export const TOC_original: ProblemSet[] = all.map((val) => Object.freeze(val));
+export const TOC_original: ProblemSet[] = all;
 
-// we are mutating this
-//copy over the gen() functions that got removed because of stringify
-export let TOC: ProblemSet[] = JSON.parse(JSON.stringify(all)).map(
-  (val, index) => {
-    let m1 = Object.assign(val, TOC_original[index]);
-    //so we can run has_started() since it deleted the prototype link to the clas :/
-    m1.__proto__ = ProblemSet.prototype;
-    return m1;
-  }
-);
+// we are mutating this, so it is a deep clone of the data above.
+// clone_problem_set() keeps the gen() function that stringify would have removed.
+export let TOC: ProblemSet[] = all.map(clone_problem_set);
 //window.toc = TOC;
 //the home page of your course will be at https://yourdomain.com/example_course , where example_course is the name of the course(all spaces are replaced by underscores) to avoid making a get req to the server
 export const COURSE_NAME = "computer systems";
